@@ -44,13 +44,13 @@ export default function Shop() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-5 py-14">
-      <Reveal className="text-center mb-10">
+    <div className="max-w-7xl mx-auto px-5 pt-8 pb-14">
+      <Reveal className="text-center mb-6">
         <h1 className="font-heading text-gold text-3xl mb-2">{t('shop')}</h1>
         <p className="text-cream/50 text-sm">{t('shopSubtitle')}</p>
       </Reveal>
 
-      <Reveal delay={0.1} className="flex flex-wrap justify-center gap-2.5 mb-10">
+      <Reveal delay={0.1} className="flex flex-wrap justify-center gap-2.5 mb-8">
         {categories.map((c) => {
           const active = filter === c.key;
           return (
@@ -91,7 +91,7 @@ export default function Shop() {
           ))}
         </div>
       ) : loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-xl overflow-hidden border border-emerald-800">
               <div className="aspect-square shimmer" />
@@ -105,7 +105,7 @@ export default function Shop() {
       ) : filtered.length === 0 ? (
         <div className="text-center text-cream/50 py-16">{t('noProducts')}</div>
       ) : (
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <AnimatePresence mode="popLayout">
             {filtered.map((p, i) => (
               <motion.div
