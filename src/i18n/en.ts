@@ -275,6 +275,15 @@ const en = {
 
   // Footer
   footerTagline: 'Handcrafted Panchaloha sacred bells, made for prayer & ritual.',
+  footerAbout:
+    'Panchaloha pooja bells whose sound resonates as the Pranava — Om. Cast and tuned by hand, carrying forward a sacred tradition for every home and temple.',
+  footerQuickLinks: 'Quick Links',
+  footerOurBells: 'Our Bells',
+  footerGetInTouch: 'Get in Touch',
+  footerFollow: 'Follow us',
+  footerCall: 'Call',
+  footerWhatsApp: 'WhatsApp',
+  footerEmail: 'Email',
   rights: 'All rights reserved.',
 };
 

@@ -278,6 +278,15 @@ const kn: Record<keyof typeof en, string> = {
 
   // Footer
   footerTagline: 'ಪೂಜೆ ಮತ್ತು ವಿಧಿವಿಧಾನಗಳಿಗಾಗಿ ಕರಕುಶಲವಾಗಿ ತಯಾರಿಸಿದ ಪಂಚಲೋಹದ ಪವಿತ್ರ ಘಂಟೆಗಳು.',
+  footerAbout:
+    'ಪ್ರಣವ — ಓಂ — ನಾದವನ್ನು ಮೊಳಗಿಸುವ ಪಂಚಲೋಹದ ಪೂಜಾ ಘಂಟೆಗಳು. ಕೈಯಿಂದ ಎರಕ ಹೊಯ್ದು ನಾದ ಹೊಂದಿಸಲಾಗಿದೆ — ಪ್ರತಿ ಮನೆ ಮತ್ತು ದೇವಾಲಯಕ್ಕಾಗಿ ಪವಿತ್ರ ಪರಂಪರೆಯನ್ನು ಮುಂದುವರಿಸುತ್ತಿದ್ದೇವೆ.',
+  footerQuickLinks: 'ತ್ವರಿತ ಕೊಂಡಿಗಳು',
+  footerOurBells: 'ನಮ್ಮ ಘಂಟೆಗಳು',
+  footerGetInTouch: 'ಸಂಪರ್ಕಿಸಿ',
+  footerFollow: 'ನಮ್ಮನ್ನು ಅನುಸರಿಸಿ',
+  footerCall: 'ಕರೆ',
+  footerWhatsApp: 'WhatsApp',
+  footerEmail: 'ಇಮೇಲ್',
   rights: 'ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.',
 };
 
