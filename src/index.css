@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 88px);
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', 'Noto Sans Kannada', sans-serif;
+  background-color: #0b2e28;
+  color: #f4ede1;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #081f1b;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9a24b;
+  border-radius: 6px;
+}
+
+/* Kannada: letter-spacing (tracking-*) breaks up conjunct glyphs and uppercase
+   does nothing, so neutralise both; give the taller script more line height. */
+html[lang='kn'] body * {
+  letter-spacing: normal !important;
+}
+html[lang='kn'] body {
+  line-height: 1.7;
+}
+html[lang='kn'] h1,
+html[lang='kn'] h2,
+html[lang='kn'] h3 {
+  line-height: 1.45;
+}
+
+/* Home hero: the felt-backed bell photo gets soft edges so it melts into the
+   matching green background */
+.hero-edge-left {
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at center, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at center, #000 55%, transparent 100%);
+}
+@media (max-width: 767px) {
+  /* One bell centred behind the text on phones, dimmed so text stays readable.
+     left/margin/filter rather than transform/opacity, which Framer Motion animates inline. */
+  .hero-edge-left {
+    left: 50%;
+    margin-left: -180px;
+    filter: brightness(0.45);
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablets: dim the bell slightly as it sits closer to the text */
+  .hero-edge-left {
+    filter: brightness(0.7);
+  }
+}
+
+/* Ring the bell: the glow follows the live loudness of the recording.
+   --level (0–1) is set every frame by RingTheBell while the sound plays. */
+.bell-glow {
+  box-shadow:
+    0 0 calc(18px + var(--level, 0) * 70px) calc(var(--level, 0) * 12px)
+      rgba(201, 162, 75, calc(0.25 + var(--level, 0) * 0.55)),
+    inset 0 0 calc(var(--level, 0) * 28px) rgba(232, 205, 138, calc(var(--level, 0) * 0.5));
+  transition: box-shadow 60ms linear;
+}
+
+/* Loading placeholder for images and skeletons */
+.shimmer {
+  background: linear-gradient(100deg, #0b2e28 20%, #174238 40%, #0b2e28 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Respect users who ask their OS for less motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+.DS_Store
+
+# Secrets — never commit
+.env.local
+.env.*.local
+.env
+
+# Tool state
+.vercel
+supabase/.temp
+supabase/.branches
+*.log

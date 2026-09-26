@@ -1,0 +1,282 @@
+// English UI strings. Kannada lives in kn.ts with the same keys.
+const en = {
+  // Navigation
+  brand: 'Pranavanaada',
+  home: 'Home',
+  shop: 'Shop',
+  about: 'About',
+  reviews: 'Reviews',
+  contact: 'Contact',
+  toggleMenu: 'Toggle menu',
+  language: 'Language',
+  cartAria_one: 'Enquiry list, {{count}} item',
+  cartAria_other: 'Enquiry list, {{count}} items',
+
+  // Home — hero (subtitle from the original Pranavanaada site)
+  heroEyebrow: 'Panchaloha Craft · Sacred Pooja Bells',
+  heroTitle: 'Pranavanaada',
+  heroSubtitle:
+    'Experience the divine resonance of authentic handcrafted bells, blessed with centuries of tradition and spiritual significance.',
+  featHandcrafted: 'Handcrafted',
+  featPanchaloha: 'Panchaloha Metal',
+  featCasting: 'Traditional Casting',
+  featShipping: 'Ships Pan-India',
+  shopByCategory: 'Shop by category',
+
+  // Home — featured products
+  products: 'Our Products',
+  productsSubtitle: 'A glimpse of the collection',
+  viewFullCollection: 'View full collection',
+
+  // Home — why choose us (from the original site)
+  whyTitle: 'Why Choose Our Sacred Bells?',
+  whySoundTitle: 'Divine Sound',
+  whySoundText: 'Each bell produces pure, resonant tones that elevate your spiritual practice and meditation.',
+  whyCraftTitle: 'Authentic Craftsmanship',
+  whyCraftText: 'Handcrafted by skilled artisans using traditional techniques passed down through generations.',
+  whySpiritTitle: 'Spiritual Significance',
+  whySpiritText: 'Every design carries deep spiritual meaning, enhancing your connection with the divine.',
+  whyMaterialTitle: 'Premium Materials',
+  whyMaterialText: 'Made from high-quality metals that ensure durability and lasting spiritual value.',
+
+  // Checkout
+  buyNow: 'Buy Now',
+  coTitle: 'Checkout',
+  coContact: 'Contact details',
+  coFullName: 'Full name',
+  coEmail: 'Email',
+  coPhone: 'Mobile number',
+  coAltPhone: 'Alternate mobile (optional)',
+  coAddress: 'Delivery address',
+  coAddress1: 'House / flat no., building, street',
+  coAddress2: 'Area / locality (optional)',
+  coLandmark: 'Landmark (optional)',
+  coCity: 'City / town',
+  coState: 'State',
+  coSelectState: 'Select state',
+  coPincode: 'PIN code',
+  coAddressType: 'Address type',
+  coHome: 'Home',
+  coOffice: 'Office',
+  coTemple: 'Temple',
+  coOther: 'Other',
+  coDelivery: 'Delivery',
+  coDeliveryDate: 'Preferred delivery date',
+  coDeliveryHint:
+    "Each bell is made and tuned with care, so the earliest date is {{days}} days from today. We'll confirm the final date with you.",
+  coNotes: 'Delivery instructions or gift message (optional)',
+  coGst: 'Need a GST invoice? (optional)',
+  coGstin: 'GSTIN',
+  coPayment: 'Payment method',
+  coPayNow: 'Pay now',
+  coPayNowHint: 'UPI, cards, net banking or wallets — secured by Razorpay',
+  coCod: 'Pay on delivery',
+  coCodHint: 'Pay by cash or UPI when your order arrives',
+  coCodOver: 'Available for orders up to {{amount}}',
+  coUnavailable: 'Not available right now',
+  coSummary: 'Order summary',
+  coSubtotal: 'Subtotal',
+  coShipping: 'Delivery',
+  coFree: 'Free',
+  coTotal: 'Total',
+  coPlaceCod: 'Place order',
+  coPay: 'Pay {{amount}}',
+  coProcessing: 'Processing…',
+  coEmpty: 'Your cart is empty.',
+  coSecure: 'Payments are processed securely by Razorpay. We never see your card or UPI details.',
+  coFixFields: 'Please check the highlighted fields.',
+  coErrUnavailable: 'Some items are no longer available: {{items}}. Please remove them from your cart.',
+  coErrCod: "Pay on delivery isn't available for this order. Please choose Pay now.",
+  coErrServer: 'Something went wrong while placing your order. Please try again, or send your order on WhatsApp.',
+  coErrNotSetup: "Online ordering isn't switched on yet. Please send your order on WhatsApp instead.",
+  coPaymentCancelled: 'Payment was not completed. Your order {{number}} is saved — you can try paying again.',
+  coPaymentFailed: 'Payment failed ({{reason}}). Your order {{number}} is saved — you can try again.',
+  coRetryPayment: 'Try payment again',
+  coVerifyFailed:
+    "We couldn't confirm your payment automatically. If money was deducted, don't worry — we'll confirm it shortly. Your order number is {{number}}.",
+  errName: 'Enter your full name',
+  errEmail: 'Enter a valid email address',
+  errPhone: 'Enter a valid 10-digit mobile number',
+  errAddress: 'Enter your house / street address',
+  errCity: 'Enter your city or town',
+  errState: 'Select your state',
+  errPincode: 'Enter a valid 6-digit PIN code',
+  errGstin: 'GSTIN should be 15 letters and numbers',
+  errDeliveryDate: 'Choose a date on or after {{date}}',
+
+  // Order confirmation
+  okTitle: 'Thank you! Your order is placed.',
+  okPaid: 'Payment received',
+  okCod: 'Pay {{amount}} on delivery',
+  okNumber: 'Order number',
+  okNext: "We'll call or WhatsApp you on {{phone}} to confirm the delivery date.",
+  okDeliverTo: 'Delivering to',
+  okPreferred: 'Preferred delivery date',
+  okQuestions: 'Questions about your order?',
+  okWhatsApp: 'Message us on WhatsApp',
+  okMissing: "Your order has been placed. We'll contact you shortly to confirm it.",
+
+  // Stock
+  outOfStock: 'Out of stock',
+  weightOutOfStock: 'This weight is out of stock',
+  askAvailability: 'Ask about availability',
+
+  // Combo offers
+  combo: 'Combo',
+  combos: 'Combo Offers',
+  combosSubtitle: 'Specially priced sets of our bells',
+  includes: 'Includes',
+  regularPrice: 'Regular price',
+  youSave: 'You save {{amount}}',
+
+  // Ring the bell (real recording)
+  ringBell: 'Ring the bell',
+  ringHint: 'Tap to hear the Pranava Naada',
+  listening: 'Listen… Om · Om · Om',
+  tapToStop: 'Tap the bell to stop',
+  stopSound: 'Stop the sound',
+  hearBell: 'Hear the bell',
+
+  // Videos (section text from the original site)
+  videos: 'Videos',
+  soundTitle: 'Experience the Divine Sound',
+  soundText:
+    'Watch and listen to the sacred resonance of our handcrafted Pranavanaada bells. Each bell produces pure, spiritual vibrations that elevate your meditation and prayer, connecting you with centuries of devotional tradition.',
+  watchAllVideos: 'Watch all {{count}} videos',
+  videosTitle: 'Videos',
+  videosSubtitle: 'Features, interviews and talks about the Pranavanaada bell and the traditions behind it.',
+  allVideos: 'All',
+  catBell: 'Bell & Omkara',
+  catTalks: 'Talks & Stories',
+  playVideo: 'Play video: {{title}}',
+  watchOnYouTube: 'Watch on YouTube',
+
+  // Home — closing call to action
+  journeyTitle: 'Begin Your Spiritual Journey',
+  journeySubtitle: 'Connect with the divine through our sacred bells',
+  exploreCollection: 'Explore the Collection',
+
+  // Categories
+  allProducts: 'All Products',
+  handBells: 'Hand Bells',
+  hangingBells: 'Hanging Bells',
+  jayagante: 'Jayagante',
+
+  // Shop
+  shopSubtitle: 'Handcrafted Panchaloha bells — hand bells, hanging bells & Jayagante',
+  noProducts: 'No products in this category yet.',
+
+  // Product card / detail
+  viewDetails: 'View Details',
+  enquireNow: 'Enquire Now',
+  addToEnquiry: 'Add to Enquiry',
+  inList: 'In List',
+  zoomProduct: 'Zoom {{name}}',
+  tapToZoom: 'Tap to zoom',
+  backToShop: '← Back to Shop',
+  productNotFound: 'Product not found.',
+  photoOf: 'Photo {{n}} of {{total}}',
+  inYourList: '✓ In your enquiry list:',
+  viewList: 'View list',
+  quantity: 'Quantity',
+  weight: 'Weight',
+  size: 'Size',
+  price: 'Price',
+  decreaseQty: 'Decrease quantity',
+  increaseQty: 'Increase quantity',
+
+  // Zoom viewer
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  close: 'Close',
+  zoomHint: 'Tap to zoom · drag to move · pinch or scroll to zoom further',
+
+  // Enquiry list (cart)
+  enquiryList: 'Enquiry List',
+  yourDetails: 'Your Details',
+  back: 'Back',
+  emptyList: 'Your enquiry list is empty.',
+  each: '{{price}} each',
+  remove: 'Remove',
+  removeItem: 'Remove {{name}}',
+  estimatedTotal: 'Estimated total',
+  noPaymentNote: 'Buy now to pay online or on delivery — or send an enquiry first if you have questions.',
+  enquireAll: 'Enquire for All',
+  enquireOnWhatsApp: 'Send list on WhatsApp',
+  enquiringAbout_one: 'Enquiring about {{count}} item',
+  enquiringAbout_other: 'Enquiring about {{count}} items',
+  optional: '(optional)',
+  messagePlaceholder: 'Delivery city, occasion, any customisation…',
+  listSendError:
+    "We couldn't send this right now — please use the WhatsApp button below and your list will be sent to us directly.",
+  sending: 'Sending…',
+  continueBrowsing: 'Continue browsing',
+  addedToList: 'Added to enquiry list',
+  view: 'View',
+  waListIntro: "Hi, I'd like to enquire about these items:",
+  waName: 'Name',
+
+  // Enquiry forms
+  sendEnquiry: 'Send an Enquiry',
+  generalEnquiry: 'General Enquiry',
+  yourName: 'Your Name',
+  contactDetails: 'Phone / Email',
+  yourMessage: 'Your Message',
+  submit: 'Submit',
+  cancel: 'Cancel',
+  thankYouEnquiry: "Thank you — we've received your enquiry and will get back to you shortly.",
+  enquiryError: 'Something went wrong sending this — please try again, or reach us directly via WhatsApp.',
+
+  // Contact (intro and points from the original site)
+  contactTitle: 'Contact Us',
+  contactIntro:
+    'Experience the divine sound of Pranavanaada bells. Our team is here to help you find the perfect spiritual companion.',
+  contactSub: 'Connect with us for spiritual guidance and our premium bell collection',
+  whatsappPhone: 'WhatsApp / Phone',
+  email: 'Email',
+  messageOnWhatsApp: 'Message us on WhatsApp instead →',
+  waContactText: 'Hi, I have a question about your bells.',
+  waFloatText: 'Hi, I would like to know more about your bells.',
+  chatOnWhatsApp: 'Chat on WhatsApp',
+  thankYouMessage: "Thank you — we've received your message and will get back to you shortly.",
+  contactError: 'Something went wrong — please try WhatsApp instead for now.',
+  pointQuick: 'Quick Response',
+  pointSecure: 'Secure Communication',
+  pointSupport: 'Premium Support',
+
+  // About (from the original site)
+  invocation: '|| Sri Ranga Maha Guruve Namaha ||',
+  aboutTitle: 'About Pranavanaada',
+  namasteTitle: 'Namaste',
+  namasteText:
+    'This bell, a sacred instrument, is made of five metals. When it is rung, its fundamental sound naturally resonates as a sacred instrument — Om Om Om. Its echo repeats Om Om Om many times and finally dissolves into Om, giving it an extraordinary quality.',
+  storyTitle: 'Our Story',
+  storyText:
+    'The Pranavanaada bell is made of Panchaloha. Its special quality is that when it is played, the fundamental sound comes as Pranava — Om Om Om — and its echo too comes as Om Om Om many times before dissolving into Om! Panchaloha means it is made from gold, silver, copper, brass and tin. These hand bells carry one of six emblems at the top: Shankha/Chakra, Nandeeshwara, Garuda/Anjaneya, Anjaneya, the Pranava symbol and Brahmanda Gola. It is a bell that resembles the Pranava Naada seen by the Indian Maharshis in their inner vision.',
+  culturalTitle: 'Cultural Significance',
+  culturalText:
+    'For the seeker, the Pranavanaada bell is an excellent aid — at the time of pooja, for concentration, for those who do japa and tapas, and for those devoted to meditation.',
+  metalsTitle: 'The Five Metals (Panchaloha)',
+  metalGold: 'Gold',
+  metalSilver: 'Silver',
+  metalCopper: 'Copper',
+  metalBrass: 'Brass',
+  metalTin: 'Tin',
+
+  // Reviews
+  reviewsEyebrow: 'Reviews',
+  reviewsTitle: 'Divine Experiences',
+  reviewsSubtitle: 'Scholars, practitioners and devotees on the sound of a Pranavanaada bell.',
+  readFullReview: 'Read full review',
+  readAllReviews: 'Read all {{count}} reviews',
+  prevReviews: 'Previous reviews',
+  nextReviews: 'Next reviews',
+  reviewBy: 'Review by {{name}}',
+
+  // Footer
+  footerTagline: 'Handcrafted Panchaloha sacred bells, made for prayer & ritual.',
+  rights: 'All rights reserved.',
+};
+
+export default en;
+export type TranslationKeys = keyof typeof en;
