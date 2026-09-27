@@ -105,7 +105,7 @@ export default function ProductDetail() {
                 playsInline
                 controls
                 preload="auto"
-                className="block w-full aspect-square object-cover rounded-xl border border-emerald-800 bg-emerald-950"
+                className="block w-full aspect-[3/4] object-contain rounded-xl border border-emerald-800 bg-[#013b2c]"
                 aria-label={t('productVideo', { name })}
               />
             ) : (
@@ -338,19 +338,21 @@ function MagnifyImage({
       onPointerEnter={(e) => e.pointerType === 'mouse' && setHovering(true)}
       onPointerLeave={() => setHovering(false)}
       aria-label={t('zoomProduct', { name: alt })}
-      className="group relative block w-full aspect-square rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 cursor-zoom-in"
+      className="group relative block w-full aspect-[3/4] rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 cursor-zoom-in"
     >
       {/* The thumb is usually already cached from the card, so it shows
           instantly (slightly blurred) while the full-size image loads. */}
+      {/* Blurred copy fills any space around photos that aren't 3:4 (e.g. the gong on its own) */}
+      <img src={placeholder || src} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-90" />
       {placeholder && !fullLoaded && (
-        <img src={placeholder} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover blur-sm scale-105" />
+        <img src={placeholder} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain blur-sm" />
       )}
       <img
         src={src}
         alt={alt}
         decoding="async"
         onLoad={() => setFullLoaded(true)}
-        className={`relative w-full h-full object-cover transition-[transform,opacity] duration-300 ease-out ${
+        className={`relative w-full h-full object-contain transition-[transform,opacity] duration-300 ease-out ${
           fullLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ transformOrigin: origin, transform: hovering ? 'scale(2)' : 'scale(1)' }}

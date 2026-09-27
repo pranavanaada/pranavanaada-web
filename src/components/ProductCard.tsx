@@ -65,15 +65,27 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
           to={`/shop/${product.id}`}
           onMouseEnter={() => preloadImage(product.image)}
           onFocus={() => preloadImage(product.image)}
-          className="block w-full h-full"
+          className="relative block w-full h-full"
         >
+          {/* Photos are portrait (3:4) but the box is square: show the whole bell,
+              and fill the sides with a blurred copy so the cloth continues. */}
+          <img
+            src={product.thumb || product.image}
+            alt=""
+            aria-hidden
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            className={`absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-90 transition-opacity duration-700 ${
+              loaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
           <img
             src={product.thumb || product.image}
             alt={name}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
             onLoad={() => setLoaded(true)}
-            className={`w-full h-full object-cover transition-[transform,opacity] duration-700 ease-out group-hover:scale-110 ${
+            className={`relative w-full h-full object-contain transition-[transform,opacity] duration-700 ease-out group-hover:scale-105 ${
               soldOut ? 'grayscale-[60%] brightness-75' : ''
             } ${
               loaded ? 'opacity-100' : 'opacity-0'
