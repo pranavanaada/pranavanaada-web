@@ -46,6 +46,7 @@ interface Order {
   admin_notes: string | null;
   notifications?: { channel: 'email' | 'whatsapp'; to: 'customer' | 'admin'; ok: boolean; detail: string }[];
   created_at: string;
+  delivered_at?: string | null;
 }
 
 const STATUS_LABEL: Record<Order['status'], string> = {
@@ -65,17 +66,26 @@ const PAYMENT_LABEL: Record<Order['payment_status'], { text: string; cls: string
   refunded: { text: 'Refunded', cls: 'bg-cream/10 text-cream/60' },
 };
 
-type Tab = 'active' | 'unpaid' | 'done' | 'all';
+type Tab = 'active' | 'delivered' | 'cancelled' | 'unpaid' | 'all';
 
-// "Active" = needs work; unpaid online attempts are kept separate so they don't clutter it.
+const TO_DELIVER: Order['status'][] = ['placed', 'confirmed', 'shipped'];
+
+// "To deliver" = needs work; unpaid online attempts are kept separate so they don't clutter it.
 const inTab = (o: Order, tab: Tab) =>
   tab === 'all'
     ? true
     : tab === 'unpaid'
       ? o.status === 'awaiting_payment'
-      : tab === 'done'
-        ? o.status === 'delivered' || o.status === 'cancelled'
-        : ['placed', 'confirmed', 'shipped'].includes(o.status);
+      : tab === 'delivered'
+        ? o.status === 'delivered'
+        : tab === 'cancelled'
+          ? o.status === 'cancelled'
+          : TO_DELIVER.includes(o.status);
+
+/** A sale counts once it's delivered and hasn't been refunded. */
+const isSale = (o: Order) => o.status === 'delivered' && o.payment_status !== 'refunded';
+const sum = (list: Order[]) => list.reduce((t, o) => t + Number(o.total), 0);
+const deliveredOn = (o: Order) => new Date(o.delivered_at || o.created_at);
 
 const waNumber = (phone: string) => {
   const d = phone.replace(/\D/g, '');
@@ -115,7 +125,39 @@ export default function AdminOrders() {
     }
   }
 
-  const counts = (['active', 'unpaid', 'done', 'all'] as Tab[]).reduce(
+  /** Status change; keeps the delivery date in step (used for "this month" sales). */
+  function setStatus(o: Order, status: Order['status']) {
+    const changes: Partial<Order> = { status };
+    if (status === 'delivered' && o.status !== 'delivered') changes.delivered_at = new Date().toISOString();
+    if (status !== 'delivered') changes.delivered_at = null;
+    return patch(o, changes);
+  }
+
+  function markDelivered(o: Order) {
+    const cod = o.payment_method === 'cod' && o.payment_status === 'cod_pending';
+    const ok = confirm(
+      `Mark ${o.order_number} (${o.customer_name}) as delivered?` +
+        (cod ? `
+
+This was pay on delivery — it will also record ${formatINR(o.total)} as received.` : '')
+    );
+    if (!ok) return;
+    patch(o, {
+      status: 'delivered',
+      delivered_at: new Date().toISOString(),
+      ...(cod ? { payment_status: 'paid' as const } : {}),
+    });
+  }
+
+  const sales = orders.filter(isSale);
+  const now = new Date();
+  const salesThisMonth = sales.filter((o) => {
+    const d = deliveredOn(o);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  });
+  const toDeliver = orders.filter((o) => TO_DELIVER.includes(o.status));
+
+  const counts = (['active', 'delivered', 'cancelled', 'unpaid', 'all'] as Tab[]).reduce(
     (acc, t) => ({ ...acc, [t]: orders.filter((o) => inTab(o, t)).length }),
     {} as Record<Tab, number>
   );
@@ -125,12 +167,36 @@ export default function AdminOrders() {
     <div>
       <h1 className="font-heading text-gold text-2xl mb-4">Orders</h1>
 
+      {!loading && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          {[
+            { label: 'Total sales', value: sum(sales), note: `${sales.length} delivered order${sales.length === 1 ? '' : 's'}`, accent: true },
+            {
+              label: `${now.toLocaleString('en-IN', { month: 'long' })} sales`,
+              value: sum(salesThisMonth),
+              note: `${salesThisMonth.length} delivered this month`,
+            },
+            { label: 'Yet to deliver', value: sum(toDeliver), note: `${toDeliver.length} order${toDeliver.length === 1 ? '' : 's'}` },
+          ].map((c) => (
+            <div
+              key={c.label}
+              className={`rounded-xl border p-4 ${c.accent ? 'border-gold/50 bg-gold/10' : 'border-emerald-800 bg-emerald-800/30'}`}
+            >
+              <div className="text-xs uppercase tracking-wider text-cream/50">{c.label}</div>
+              <div className={`text-2xl font-semibold mt-1 ${c.accent ? 'text-gold' : 'text-cream'}`}>{formatINR(c.value)}</div>
+              <div className="text-xs text-cream/45 mt-0.5">{c.note}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2 mb-6">
         {(
           [
-            ['active', 'To fulfil'],
+            ['active', 'To deliver'],
+            ['delivered', 'Delivered'],
+            ['cancelled', 'Cancelled'],
             ['unpaid', 'Unpaid attempts'],
-            ['done', 'Delivered / cancelled'],
             ['all', 'All'],
           ] as [Tab, string][]
         ).map(([key, label]) => (
@@ -168,7 +234,9 @@ export default function AdminOrders() {
                 key={o.id}
                 className={`rounded-xl border ${o.status === 'placed' ? 'border-gold/60 bg-emerald-800/40' : 'border-emerald-800'}`}
               >
-                <button onClick={() => setOpenId(open ? null : o.id)} className="w-full text-left p-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                {/* Row: open/close toggle + delivery action side by side (a button can't hold another button) */}
+                <div className="flex flex-wrap items-center">
+                <button onClick={() => setOpenId(open ? null : o.id)} className="flex-1 min-w-0 text-left p-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="font-semibold text-cream">{o.order_number}</span>
                   <span className="text-sm text-cream/80">{o.customer_name}</span>
                   <span className="text-xs text-cream/40">
@@ -180,6 +248,21 @@ export default function AdminOrders() {
                   <span className="text-gold font-semibold">{formatINR(o.total)}</span>
                   <span className="text-cream/40">{open ? '▴' : '▾'}</span>
                 </button>
+                {TO_DELIVER.includes(o.status) ? (
+                  <div className="w-full sm:w-auto px-4 pb-4 sm:pb-0 sm:pl-0">
+                    <button
+                      onClick={() => markDelivered(o)}
+                      className="w-full sm:w-auto text-sm font-semibold px-4 py-2 rounded-md bg-gold text-emerald-950 hover:bg-gold-light transition-colors"
+                    >
+                      ✓ Mark delivered
+                    </button>
+                  </div>
+                ) : o.status === 'delivered' && o.delivered_at ? (
+                  <div className="w-full sm:w-auto px-4 pb-4 sm:pb-0 sm:pl-0 text-xs text-cream/50">
+                    Delivered {new Date(o.delivered_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
+                  </div>
+                ) : null}
+                </div>
 
                 {open && (
                   <div className="border-t border-emerald-800 p-4 md:p-5 grid lg:grid-cols-2 gap-6">
@@ -311,7 +394,7 @@ export default function AdminOrders() {
                         <label className="block text-xs text-cream/50 mb-1">Order status</label>
                         <select
                           value={o.status}
-                          onChange={(e) => patch(o, { status: e.target.value as Order['status'] })}
+                          onChange={(e) => setStatus(o, e.target.value as Order['status'])}
                           className={inputClass}
                         >
                           {Object.entries(STATUS_LABEL).map(([k, v]) => (
