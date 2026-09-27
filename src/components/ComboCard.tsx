@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Combo, Product } from '../types/product';
 import { useLang } from '../i18n/useLang';
 import { useCart } from '../hooks/useCart';
-import { formatINR, productName, weightLabel } from '../lib/productUtils';
+import { formatINR, productName, productPath, weightLabel } from '../lib/productUtils';
 import { comboDescription, comboName, isComboAvailable, regularTotal, resolveCombo } from '../lib/comboUtils';
 import { fadeUp } from './motion';
 
@@ -76,7 +76,7 @@ export default function ComboCard({
           {lines.map((l, i) => (
             <li key={i} className="flex items-center gap-2.5 text-sm">
               <img src={l.product.thumb || l.product.image} alt="" className="w-8 h-8 rounded object-cover shrink-0" />
-              <Link to={`/shop/${l.product.id}`} className="flex-1 min-w-0 truncate text-cream/80 hover:text-gold">
+              <Link to={productPath(l.product)} className="flex-1 min-w-0 truncate text-cream/80 hover:text-gold">
                 {productName(l.product, lang)}
                 {l.variant && <span className="text-cream/50"> · {weightLabel(l.variant.label, lang)}</span>}
               </Link>

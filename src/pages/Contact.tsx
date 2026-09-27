@@ -5,6 +5,8 @@ import { submitInquiry } from '../lib/inquiry';
 import Honeypot from '../components/Honeypot';
 import { Reveal } from '../components/motion';
 import { useLang } from '../i18n/useLang';
+import { useSeo } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 const inputClass =
   'w-full bg-emerald-950 border border-emerald-700 rounded-md px-3 py-2.5 text-sm outline-none focus:border-gold transition-colors';
@@ -12,6 +14,7 @@ const inputClass =
 const POINTS = ['pointQuick', 'pointSecure', 'pointSupport'];
 
 export default function Contact() {
+  useSeo({ ...SEO_PAGES['/contact'], path: '/contact' });
   const { t, lang } = useLang();
   const [website, setWebsite] = useState('');
   const [name, setName] = useState('');

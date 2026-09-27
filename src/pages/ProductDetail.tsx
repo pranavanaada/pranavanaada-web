@@ -15,6 +15,7 @@ import {
   formatINR,
   getGallery,
   getVariants,
+  findProduct,
   firstAvailableIndex,
   hasVariants,
   isVariantAvailable,
@@ -25,6 +26,7 @@ import {
   sizeLabel,
   weightLabel,
 } from '../lib/productUtils';
+import { useSeo, productSeo } from '../lib/seo';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -39,7 +41,8 @@ export default function ProductDetail() {
   const cart = useCart();
   const navigate = useNavigate();
 
-  const product = products.find((p) => p.id === id);
+  const product = findProduct(products, id);
+  useSeo(product ? productSeo(product) : null);
 
   if (loading) {
     return (

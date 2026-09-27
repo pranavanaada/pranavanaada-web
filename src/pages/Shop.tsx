@@ -9,6 +9,8 @@ import InquiryModal from '../components/InquiryModal';
 import { Reveal } from '../components/motion';
 import type { Product, ProductCategory, ProductVariant } from '../types/product';
 import { nameWithVariant } from '../lib/productUtils';
+import { useSeo } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 type Filter = ProductCategory | 'all' | 'combos';
 
@@ -21,6 +23,7 @@ const CATEGORIES: { key: Filter; labelKey: string }[] = [
 ];
 
 export default function Shop() {
+  useSeo({ ...SEO_PAGES['/shop'], path: '/shop' });
   const { t, lang } = useLang();
   const { products, loading } = useProducts();
   const { combos } = useCombos();

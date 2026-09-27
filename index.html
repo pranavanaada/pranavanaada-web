@@ -3,15 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="Discover authentic handcrafted sacred bells made from Panchaloha metals. Premium hand bells, hanging bells, and Jayagante for spiritual rituals and worship." />
+    <meta name="theme-color" content="#0b2e28" />
+    <!--SEO-->
+    <title>Pranavanaada — Handcrafted Panchaloha Pooja Bells with the Om Sound</title>
+    <meta name="description" content="Panchaloha pooja bells whose sound resonates as the Pranava — Om. Handcrafted hand bells, temple hanging bells and Jayagante from Karnataka. Shop online or enquire on WhatsApp." />
+    <link rel="canonical" href="https://www.pranavanaada.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pranavanaada" />
+    <meta property="og:title" content="Pranavanaada — Handcrafted Panchaloha Pooja Bells with the Om Sound" />
+    <meta property="og:description" content="Panchaloha pooja bells whose sound resonates as the Pranava — Om. Handcrafted hand bells, temple hanging bells and Jayagante from Karnataka." />
+    <meta property="og:url" content="https://www.pranavanaada.com/" />
+    <meta property="og:image" content="https://www.pranavanaada.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pranavanaada — Handcrafted Panchaloha Pooja Bells with the Om Sound" />
+    <meta name="twitter:image" content="https://www.pranavanaada.com/og-image.jpg" />
+    <!--/SEO-->
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Kannada fonts use unicode-range, so browsers only download them when Kannada text is shown -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600&family=Baloo+Tamma+2:wght@500;600;700&display=swap" rel="stylesheet" />
-    <title>Pranavanaada — Sacred Pooja Bells | Handcrafted Panchaloha Bells</title>
+    <link rel="preconnect" href="https://qgmjfcioczdxglhwxwoi.supabase.co" crossorigin />
+    <!-- Fonts load without blocking the first paint (text shows in a fallback font for a moment).
+         Kannada fonts use unicode-range, so they only download when Kannada text is on screen. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600&family=Baloo+Tamma+2:wght@500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap" />
+    </noscript>
+    <style>
+      /* Shown instantly while the app loads (and to crawlers that don't run JavaScript) */
+      html, body { margin: 0; background: #0b2e28; color: #f4ede1; }
+      .splash { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 24px; box-sizing: border-box; font-family: Georgia, 'Times New Roman', serif; }
+      .splash .brand { color: #c9a24b; letter-spacing: 0.08em; font-size: 14px; text-transform: uppercase; margin-bottom: 14px; }
+      .splash h1 { font-size: clamp(26px, 7vw, 44px); margin: 0 0 12px; color: #f4ede1; font-weight: 600; max-width: 900px; }
+      .splash p { font-family: system-ui, sans-serif; color: rgba(244, 237, 225, 0.7); max-width: 640px; line-height: 1.6; margin: 0; }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!--SPLASH-->
+      <div class="splash">
+        <div class="brand">Pranavanaada</div>
+        <h1>Handcrafted Panchaloha Pooja Bells</h1>
+        <p>Panchaloha pooja bells whose sound resonates as the Pranava — Om. Hand bells, temple hanging bells and Jayagante.</p>
+      </div>
+      <!--/SPLASH-->
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

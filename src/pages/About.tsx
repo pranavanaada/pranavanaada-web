@@ -2,11 +2,14 @@ import { motion } from 'framer-motion';
 import { Reveal, fadeUp, stagger } from '../components/motion';
 import { useLang } from '../i18n/useLang';
 import threeBells from '../assets/about/three-bells.webp';
+import { useSeo } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 const METALS = ['metalGold', 'metalSilver', 'metalCopper', 'metalBrass', 'metalTin'];
 
 /** About page — content from the original Pranavanaada site. */
 export default function About() {
+  useSeo({ ...SEO_PAGES['/about'], path: '/about' });
   const { t } = useLang();
   return (
     <div className="max-w-3xl mx-auto px-5 py-16">

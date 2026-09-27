@@ -13,7 +13,7 @@ import {
 import { useLang } from '../i18n/useLang';
 import { useCart } from '../hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
-import { productName } from '../lib/productUtils';
+import { productName, productPath } from '../lib/productUtils';
 import { fadeUp, stagger } from './motion';
 
 const icon = {
@@ -160,7 +160,7 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm">
             {bells.map((p) => (
               <li key={p.id}>
-                <Link to={`/shop/${p.id}`} className={linkClass}>
+                <Link to={productPath(p)} className={linkClass}>
                   <Arrow />
                   {productName(p, lang)}
                 </Link>

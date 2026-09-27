@@ -102,7 +102,7 @@ export default function HeroBells() {
           {t(bell.label)}
         </motion.div>
       </AnimatePresence>
-      <div className="flex gap-2 mt-3" role="tablist" aria-label={t('heroShowcase')}>
+      <div className="flex mt-1" role="tablist" aria-label={t('heroShowcase')}>
         {BELLS.map((b, i) => (
           <button
             key={b.label}
@@ -110,10 +110,15 @@ export default function HeroBells() {
             aria-selected={i === index}
             aria-label={t(b.label)}
             onClick={() => setIndex(i)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              i === index ? 'w-6 bg-gold' : 'w-2 bg-cream/30 hover:bg-cream/60'
-            }`}
-          />
+            className="group flex h-11 min-w-[28px] items-center justify-center px-1"
+          >
+            {/* Small dot, but the button around it is a full-size tap target */}
+            <span
+              className={`block h-2 rounded-full transition-all duration-300 ${
+                i === index ? 'w-6 bg-gold' : 'w-2 bg-cream/30 group-hover:bg-cream/60'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

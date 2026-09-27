@@ -13,10 +13,12 @@ import CombosSection from '../components/CombosSection';
 // chunk so it doesn't slow the first paint of the home page.
 const ReviewsSection = lazy(() => import('../components/ReviewsSection'));
 const VideosSection = lazy(() => import('../components/VideosSection'));
-import { Reveal, fadeUp, stagger } from '../components/motion';
+import { Reveal, fadeUp, riseIn, stagger } from '../components/motion';
 import { prefetchRoute } from './lazy';
 import type { Product, ProductVariant } from '../types/product';
 import { nameWithVariant } from '../lib/productUtils';
+import { useSeo, organizationJsonLd, websiteJsonLd } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 const iconProps = {
   viewBox: '0 0 24 24',
@@ -111,6 +113,7 @@ const CATEGORY_CHIPS = [
 ];
 
 export default function Home() {
+  useSeo({ ...SEO_PAGES['/'], path: '/', jsonLd: [organizationJsonLd(), websiteJsonLd()] });
   const { t, lang } = useLang();
   const { products, loading } = useProducts();
   const [enquiryName, setEnquiryName] = useState<string | null>(null);
@@ -165,13 +168,13 @@ export default function Home() {
             {t('heroEyebrow')}
           </motion.div>
           <motion.h1
-            variants={fadeUp}
+            variants={riseIn}
             className="font-heading text-[clamp(1.5rem,calc((100vw-56px)/9.4),3rem)] sm:text-6xl md:text-7xl lg:text-5xl xl:text-6xl font-semibold sm:tracking-wide leading-tight whitespace-nowrap mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
           >
             {t('heroTitle')}
           </motion.h1>
           <motion.p
-            variants={fadeUp}
+            variants={riseIn}
             className="text-cream/85 text-base md:text-lg max-w-2xl mx-auto mb-9 leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
           >
             {t('heroSubtitle')}

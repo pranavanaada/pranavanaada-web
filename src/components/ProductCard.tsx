@@ -14,6 +14,7 @@ import {
   productBadge,
   productDescription,
   productName,
+  productPath,
   sizeLabel,
 } from '../lib/productUtils';
 import { fadeUp } from './motion';
@@ -62,7 +63,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
         {/* Shimmer placeholder while the image loads */}
         {!loaded && <div className="absolute inset-0 shimmer" aria-hidden />}
         <Link
-          to={`/shop/${product.id}`}
+          to={productPath(product)}
           onMouseEnter={() => preloadImage(product.image)}
           onFocus={() => preloadImage(product.image)}
           className="relative block w-full h-full"
@@ -112,7 +113,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
         </button>
       </div>
       <div className="p-2.5 sm:p-4 flex flex-col flex-1">
-        <Link to={`/shop/${product.id}`} className="font-medium text-[13px] sm:text-sm leading-snug mb-1 line-clamp-2 hover:text-gold transition-colors">
+        <Link to={productPath(product)} className="font-medium text-[13px] sm:text-sm leading-snug mb-1 line-clamp-2 hover:text-gold transition-colors">
           {name}
         </Link>
         {/* Price follows the chosen weight */}

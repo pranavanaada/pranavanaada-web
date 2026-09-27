@@ -25,6 +25,7 @@ import {
   type PaymentMethod,
   type StoreSettings,
 } from '../lib/checkout';
+import { useSeo } from '../lib/seo';
 
 const EMPTY: CheckoutCustomer = {
   name: '',
@@ -64,6 +65,7 @@ function validate(c: CheckoutCustomer, earliest: string): Field[] {
 }
 
 export default function Checkout() {
+  useSeo({ title: 'Checkout | Pranavanaada', path: '/checkout', noindex: true });
   const { t, lang } = useLang();
   const cart = useCart();
   const navigate = useNavigate();

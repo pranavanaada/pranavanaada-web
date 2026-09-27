@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { isSupabaseConfigured } from '../lib/supabaseConfig';
+import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from '../lib/supabaseConfig';
 import { sortProducts } from '../lib/productUtils';
 import { fallbackProducts } from '../data/products';
 import type { Combo, Product } from '../types/product';
@@ -24,7 +24,17 @@ async function fetchTable<T>(
 ): Promise<Result<T>> {
   if (!isSupabaseConfigured) return { rows: fallback, usingFallback: true };
   try {
-    // Loaded lazily so the Supabase SDK isn't part of the first page load.
+    if (onlyVisible) {
+      // Public catalogue: a plain REST call, so visitors never download the Supabase SDK.
+      const res = await fetch(`${supabaseUrl}/rest/v1/${table}?select=*&is_visible=eq.true`, {
+        headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${supabaseAnonKey}` },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as (T & { sort_order?: number })[];
+      return { rows: sortProducts(data) as T[], usingFallback: false };
+    }
+    // Admin views include hidden rows, which need the signed-in session.
     const { supabase } = await import('../lib/supabaseClient');
     let query = supabase.from(table).select('*');
     if (onlyVisible) query = query.eq('is_visible', true);

@@ -2,9 +2,12 @@ import { reviews } from '../data/reviews';
 import ReviewCard from '../components/ReviewCard';
 import { Reveal } from '../components/motion';
 import { useLang } from '../i18n/useLang';
+import { useSeo } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 /** All reviews in full, in a two-column masonry layout. */
 export default function Reviews() {
+  useSeo({ ...SEO_PAGES['/reviews'], path: '/reviews' });
   const { t } = useLang();
   return (
     <div className="max-w-6xl mx-auto px-5 py-14">

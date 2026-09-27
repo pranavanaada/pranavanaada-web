@@ -88,3 +88,20 @@ export function nameWithVariant(product: Product, variant: ProductVariant | unde
   const name = productName(product, lang);
   return variant?.label ? `${name} · ${weightLabel(variant.label, lang)}` : name;
 }
+
+// ---- URLs ------------------------------------------------------------------------
+
+/** "Anjaneya Hand Bell" → "anjaneya-hand-bell" (readable, search-friendly URLs). */
+export const slugify = (name: string) =>
+  name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+/** Product page URL, e.g. /shop/anjaneya-hand-bell */
+export const productPath = (p: { name: string }) => `/shop/${slugify(p.name)}`;
+
+/** Find a product from a URL segment: its slug, or (for older links) its id. */
+export const findProduct = <T extends { id: string; name: string }>(list: T[], param: string | undefined) =>
+  param ? list.find((p) => slugify(p.name) === param) ?? list.find((p) => p.id === param) : undefined;

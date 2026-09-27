@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLang } from '../i18n/useLang';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCart, formatINR, describeItems, itemLabel, type CartItem } from '../hooks/useCart';
-import { sizeLabel, weightLabel, type Lang } from '../lib/productUtils';
+import { productPath, sizeLabel, weightLabel, type Lang } from '../lib/productUtils';
 import { isSupabaseConfigured } from '../lib/supabaseConfig';
 import { submitInquiry } from '../lib/inquiry';
 import Honeypot from './Honeypot';
@@ -13,6 +13,7 @@ import { WHATSAPP_WA_LINK } from '../config/contact';
 type Step = 'list' | 'form' | 'sent';
 
 const localName = (item: CartItem, lang: Lang) => (lang === 'kn' && item.name_kn) || item.name;
+const itemPath = (item: CartItem) => (item.combo ? '/shop?category=combos' : productPath(item));
 
 const inputClass =
   'w-full bg-emerald-950 border border-emerald-700 rounded-md px-3 py-2.5 text-sm outline-none focus:border-gold transition-colors';
@@ -192,7 +193,7 @@ export default function CartDrawer() {
                             className="overflow-hidden"
                           >
                             <div className="flex gap-3 py-3">
-                              <Link to={`/shop/${item.id}`} onClick={close} className="shrink-0">
+                              <Link to={itemPath(item)} onClick={close} className="shrink-0">
                                 <img
                                   src={item.thumb}
                                   alt={localName(item, lang)}
@@ -202,7 +203,7 @@ export default function CartDrawer() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex justify-between gap-2">
                                   <Link
-                                    to={`/shop/${item.id}`}
+                                    to={itemPath(item)}
                                     onClick={close}
                                     className="text-sm font-medium truncate hover:text-gold"
                                   >

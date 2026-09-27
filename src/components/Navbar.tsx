@@ -73,7 +73,10 @@ function LanguageSwitcher() {
                 transition={{ type: 'spring', stiffness: 500, damping: 35 }}
               />
             )}
-            <span className="relative">{l.label}</span>
+            {/* System font for the label, so English pages don't download the Kannada web font */}
+            <span className="relative" style={l.code === 'kn' && lang !== 'kn' ? { fontFamily: 'system-ui, sans-serif' } : undefined}>
+              {l.label}
+            </span>
           </button>
         );
       })}

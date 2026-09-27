@@ -4,6 +4,8 @@ import { useLang } from '../i18n/useLang';
 import { videos, type Video, type VideoCategory } from '../data/videos';
 import { VideoCard, VideoModal } from '../components/Video';
 import { Reveal } from '../components/motion';
+import { useSeo } from '../lib/seo';
+import SEO_PAGES from '../seo-pages.json';
 
 const FILTERS: { key: VideoCategory | 'all'; labelKey: string }[] = [
   { key: 'all', labelKey: 'allVideos' },
@@ -13,6 +15,7 @@ const FILTERS: { key: VideoCategory | 'all'; labelKey: string }[] = [
 
 /** All videos from the original site, filterable by category. */
 export default function Videos() {
+  useSeo({ ...SEO_PAGES['/videos'], path: '/videos' });
   const { t } = useLang();
   const [filter, setFilter] = useState<VideoCategory | 'all'>('all');
   const [playing, setPlaying] = useState<Video | null>(null);

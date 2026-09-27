@@ -5,9 +5,11 @@ import { useLang } from '../i18n/useLang';
 import { formatINR } from '../lib/productUtils';
 import { recallOrder } from '../lib/checkout';
 import { WHATSAPP_WA_LINK } from '../config/contact';
+import { useSeo } from '../lib/seo';
 
 /** Shown after a successful order (COD placed, or online payment verified). */
 export default function OrderConfirmed() {
+  useSeo({ title: 'Order confirmed | Pranavanaada', path: '/order-confirmed', noindex: true });
   const { t } = useLang();
   const order = useMemo(recallOrder, []);
 

@@ -8,6 +8,12 @@ export const fadeUp: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } },
 };
 
+/** Slide-in only: the element is visible from the first frame, so it can count as the page's main content (LCP). */
+export const riseIn: Variants = {
+  hidden: { y: 24 },
+  show: { y: 0, transition: { duration: 0.7, ease: easeOut } },
+};
+
 export const stagger = (staggerChildren = 0.08, delayChildren = 0): Variants => ({
   hidden: {},
   show: { transition: { staggerChildren, delayChildren } },
