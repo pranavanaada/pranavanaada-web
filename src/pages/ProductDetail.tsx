@@ -103,7 +103,9 @@ export default function ProductDetail() {
                 muted
                 loop
                 playsInline
-                controls
+                // No play/pause bar — it just plays on a loop, like a moving photo
+                disablePictureInPicture
+                disableRemotePlayback
                 preload="auto"
                 className="block w-full aspect-[3/4] object-contain rounded-xl border border-emerald-800 bg-[#013b2c]"
                 aria-label={t('productVideo', { name })}
