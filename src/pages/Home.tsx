@@ -144,7 +144,7 @@ export default function Home() {
           aria-hidden
         />
 
-        <div className="relative max-w-6xl mx-auto px-5 pt-10 pb-14 lg:py-16 grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-10 items-center">
+        <div className="relative max-w-6xl mx-auto px-5 pt-10 pb-14 lg:py-16 grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-6 lg:gap-10 items-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -159,14 +159,14 @@ export default function Home() {
           variants={stagger(0.12, 0.2)}
           initial="hidden"
           animate="show"
-          className="relative w-full text-center lg:order-1"
+          className="relative w-full min-w-0 text-center lg:order-1"
         >
           <motion.div variants={fadeUp} className="text-xs uppercase tracking-[0.25em] text-gold-light mb-5">
             {t('heroEyebrow')}
           </motion.div>
           <motion.h1
             variants={fadeUp}
-            className="font-heading text-[clamp(1.75rem,8.5vw,3rem)] sm:text-6xl md:text-7xl lg:text-6xl font-semibold sm:tracking-wide leading-tight whitespace-nowrap mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
+            className="font-heading text-[clamp(1.5rem,calc((100vw-56px)/9.4),3rem)] sm:text-6xl md:text-7xl lg:text-5xl xl:text-6xl font-semibold sm:tracking-wide leading-tight whitespace-nowrap mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
           >
             {t('heroTitle')}
           </motion.h1>
