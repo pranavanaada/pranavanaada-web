@@ -132,7 +132,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
           </AnimatePresence>
         </div>
         {/* Description is on the product page; hidden on phones to keep cards compact */}
-        <p className="hidden sm:block text-xs text-cream/60 leading-relaxed mb-3 flex-1 line-clamp-2">{productDescription(product, lang)}</p>
+        <p className="card-desc hidden sm:block text-xs text-cream/60 leading-relaxed mb-3 flex-1 line-clamp-2">{productDescription(product, lang)}</p>
         <div className="flex-1 sm:hidden" aria-hidden />
         {multi && (
           <div className="mb-2.5 sm:mb-4">
@@ -142,7 +142,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
               onSelect={setSelected}
               layoutGroup={product.id}
             />
-            {variant.size && <div className="hidden sm:block text-[11px] text-cream/40 mt-1.5">{sizeLabel(variant.size, lang)}</div>}
+            {variant.size && <div className="card-size hidden sm:block text-[11px] text-cream/40 mt-1.5">{sizeLabel(variant.size, lang)}</div>}
           </div>
         )}
         <div className="flex gap-1.5 sm:gap-2">

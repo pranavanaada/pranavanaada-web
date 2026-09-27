@@ -105,3 +105,33 @@ html[lang='kn'] h3 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Home page on laptops/desktops: products and "why choose" each fill one screen, so one scroll
+   (useScreenPaging) shows exactly one of them. html.home-snap is set only on the home page. */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.home-snap .snap-screen {
+    min-height: calc(100vh - var(--header-h, 72px));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  html.home-snap .snap-fill {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* Four product cards + the link have to fit one laptop screen: photos take the height that's
+     left (never below 150px), and the short description / size line stay on the product page. */
+  html.home-snap .home-featured .aspect-square {
+    max-height: max(150px, calc(100vh - var(--header-h, 72px) - 400px));
+  }
+  html.home-snap .home-featured .card-desc,
+  html.home-snap .home-featured .card-size,
+  html.home-snap .home-featured .home-sub {
+    display: none;
+  }
+  html.home-snap .home-featured h2 {
+    margin-bottom: 1.25rem;
+  }
+}

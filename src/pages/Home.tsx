@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { useProducts } from '../hooks/useProducts';
+import { useScreenPaging } from '../hooks/useScreenPaging';
 import ProductCard from '../components/ProductCard';
 import InquiryModal from '../components/InquiryModal';
 import { WhyChoose, JourneyCta } from '../components/HomeSections';
@@ -125,6 +126,9 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 80]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
+  // Laptops/desktops: one scroll moves one screen (hero → products → why choose → …)
+  useScreenPaging();
+
   // Products the admin marked as featured; otherwise the first four.
   const flagged = products.filter((p) => p.featured);
   const featured = (flagged.length ? flagged : products).slice(0, 4);
@@ -137,7 +141,7 @@ export default function Home() {
   return (
     <>
       {/* Hero — title and bell button on one side, floating bell showcase on the other */}
-      <section ref={heroRef} className="relative overflow-hidden bg-[#013b2c]">
+      <section ref={heroRef} className="snap-section relative overflow-hidden bg-[#013b2c]">
         {/* Soft vignette + warm glow behind the bells */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/5 to-emerald-950/80" aria-hidden />
         <motion.div
@@ -201,13 +205,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Screen 2 on laptops: category chips + featured products */}
+      <div className="snap-section snap-screen">
       {/* Category chips — jump straight into a filtered Shop */}
       <nav aria-label={t('shopByCategory')} className="bg-emerald-800 border-y border-emerald-700">
         <motion.div
           variants={stagger(0.07, 0.5)}
           initial="hidden"
           animate="show"
-          className="max-w-5xl mx-auto px-5 py-4 flex gap-3 overflow-x-auto md:flex-wrap md:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="max-w-5xl mx-auto px-5 py-4 lg:py-3 flex gap-3 overflow-x-auto md:flex-wrap md:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {CATEGORY_CHIPS.map((c) => (
             <motion.div key={c.to} variants={fadeUp} className="shrink-0">
@@ -225,10 +231,10 @@ export default function Home() {
       </nav>
 
       {/* Featured products */}
-      <section className="max-w-6xl mx-auto px-5 py-16">
+      <section className="snap-fill home-featured w-full max-w-6xl mx-auto px-5 py-16 lg:py-5">
         <Reveal>
           <h2 className="font-heading text-gold text-2xl text-center mb-2">{t('products')}</h2>
-          <p className="text-center text-cream/50 text-sm mb-10">{t('productsSubtitle')}</p>
+          <p className="home-sub text-center text-cream/50 text-sm mb-10">{t('productsSubtitle')}</p>
         </Reveal>
 
         {loading ? (
@@ -257,34 +263,45 @@ export default function Home() {
           </motion.div>
         )}
 
-        <Reveal className="text-center mt-10">
+        <Reveal className="text-center mt-10 lg:mt-6">
           <Link to="/shop" className="group text-gold text-sm underline underline-offset-4 hover:text-gold-light">
             {t('viewFullCollection')}{' '}
             <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
         </Reveal>
       </section>
+      </div>
 
-      <CombosSection
-        onEnquire={(name) => {
-          setEnquiryName(name);
-          setModalOpen(true);
-        }}
-      />
+      <div className="snap-section">
+        <CombosSection
+          onEnquire={(name) => {
+            setEnquiryName(name);
+            setModalOpen(true);
+          }}
+        />
+      </div>
 
-      <WhyChoose />
+      <div className="snap-section snap-screen">
+        <WhyChoose />
+      </div>
 
       {/* Experience the Divine Sound — videos */}
-      <Suspense fallback={<div className="min-h-[520px]" />}>
-        <VideosSection />
-      </Suspense>
+      <div className="snap-section">
+        <Suspense fallback={<div className="min-h-[520px]" />}>
+          <VideosSection />
+        </Suspense>
+      </div>
 
       {/* Testimonials */}
-      <Suspense fallback={<div className="min-h-[420px]" />}>
-        <ReviewsSection />
-      </Suspense>
+      <div className="snap-section">
+        <Suspense fallback={<div className="min-h-[420px]" />}>
+          <ReviewsSection />
+        </Suspense>
+      </div>
 
-      <JourneyCta />
+      <div className="snap-section">
+        <JourneyCta />
+      </div>
 
       <InquiryModal
         open={modalOpen}
