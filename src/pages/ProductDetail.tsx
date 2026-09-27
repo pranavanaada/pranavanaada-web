@@ -28,6 +28,7 @@ import {
   weightLabel,
   scaleStyle,
   sizeScale,
+  PHOTO_TO_SCALE,
 } from '../lib/productUtils';
 import { useSeo, productSeo } from '../lib/seo';
 
@@ -140,7 +141,7 @@ export default function ProductDetail() {
           </motion.div>
         </AnimatePresence>
 
-        {toScale && multi && variant.size && (
+        {PHOTO_TO_SCALE && toScale && multi && variant.size && (
           <p className="text-[11px] text-cream/45 mt-2 text-center">
             {t('shownToScale', { size: `${weightLabel(variant.label, lang)} · ${sizeLabel(variant.size, lang)}` })}
           </p>

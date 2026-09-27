@@ -13,7 +13,11 @@ const inches = (size?: string) => Math.max(0, ...[...(size ?? '').matchAll(/([\d
  * How big this weight looks next to the product's largest weight (1 = largest), from the
  * sizes the admin entered — so the photo can be shown to scale when a weight is picked.
  */
+/** Switched off for now — set to true to resize photos with the picked weight again. */
+export const PHOTO_TO_SCALE = false;
+
 export function sizeScale(product: Product, variant?: ProductVariant) {
+  if (!PHOTO_TO_SCALE) return 1;
   const max = Math.max(0, ...getVariants(product).map((v) => inches(v.size)));
   const cur = inches(variant?.size);
   return max && cur ? Math.min(1, cur / max) : 1;
