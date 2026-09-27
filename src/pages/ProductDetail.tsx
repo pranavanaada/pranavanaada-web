@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useLang } from '../i18n/useLang';
 import { AnimatePresence, motion } from 'framer-motion';
+import SpinViewer, { SpinIcon } from '../components/SpinViewer';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../hooks/useCart';
 import { QtyStepper } from '../components/CartDrawer';
@@ -37,7 +38,8 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   // null until the visitor picks a weight — then we default to the first in-stock one
   const [selectedPick, setSelected] = useState<number | null>(null);
-  const [photo, setPhoto] = useState(0);
+  // null = nothing picked yet: products with a 360° view open on it, others on the first photo
+  const [picked, setPhoto] = useState<number | null>(null);
   const cart = useCart();
   const navigate = useNavigate();
 
@@ -75,8 +77,13 @@ export default function ProductDetail() {
   const available = isVariantAvailable(product, multi ? variant : undefined);
   const gallery = getGallery(product);
   // The video (if any) sits after the photos: index === gallery.length.
+  const spin = product.spin ?? [];
+  const hasSpin = spin.length >= 2;
+  const SPIN = -1;
+  const photo = picked ?? (hasSpin ? SPIN : 0);
+  const showSpin = hasSpin && photo === SPIN;
   const showVideo = !!product.video && photo === gallery.length;
-  const currentPhoto = gallery[Math.min(photo, gallery.length - 1)];
+  const currentPhoto = gallery[Math.min(Math.max(photo, 0), gallery.length - 1)];
   // Everything of this product in the list, across all weights
   const inList = cart.items.filter((i) => i.id === product.id);
   const name = productName(product, lang);
@@ -91,13 +98,15 @@ export default function ProductDetail() {
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={showVideo ? 'video' : currentPhoto}
+            key={showSpin ? 'spin' : showVideo ? 'video' : currentPhoto}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {showVideo && product.video ? (
+            {showSpin ? (
+              <SpinViewer frames={spin} alt={name} badge={productBadge(product, lang)} />
+            ) : showVideo && product.video ? (
               // Only downloaded once the visitor picks the video thumbnail.
               <video
                 src={product.video}
@@ -125,10 +134,27 @@ export default function ProductDetail() {
           </motion.div>
         </AnimatePresence>
 
-        {(gallery.length > 1 || product.video) && (
+        {(gallery.length > 1 || product.video || hasSpin) && (
           <div className="flex flex-wrap gap-3 mt-3">
+            {hasSpin && (
+              <button
+                type="button"
+                onClick={() => setPhoto(SPIN)}
+                aria-label={t('spinThumb')}
+                aria-current={showSpin}
+                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                  showSpin ? 'border-gold' : 'border-emerald-800 opacity-70 hover:opacity-100'
+                }`}
+              >
+                <img src={spin[0]} alt="" className="w-full h-full object-cover brightness-75" />
+                <span className="absolute inset-0 flex flex-col items-center justify-center text-gold-light">
+                  <SpinIcon className="w-6 h-6" />
+                  <span className="text-[11px] font-bold tracking-wide">360°</span>
+                </span>
+              </button>
+            )}
             {gallery.map((src, i) => {
-              const active = !showVideo && src === currentPhoto;
+              const active = !showVideo && !showSpin && src === currentPhoto;
               return (
                 <button
                   key={src}

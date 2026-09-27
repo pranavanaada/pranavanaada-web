@@ -8,7 +8,8 @@
     "build": "tsc && vite build && node scripts/prerender-seo.mjs",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "upload-media": "node scripts/upload-media.mjs"
+    "upload-media": "node scripts/upload-media.mjs",
+    "make-spin": "node scripts/make-spin.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

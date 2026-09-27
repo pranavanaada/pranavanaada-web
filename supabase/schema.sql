@@ -62,6 +62,7 @@ alter table products add column if not exists in_stock boolean not null default 
 alter table products add column if not exists featured boolean not null default false;
 alter table products add column if not exists sort_order integer not null default 0;
 alter table products add column if not exists video text;          -- short muted clip shown in the product gallery
+alter table products add column if not exists spin jsonb not null default '[]'; -- lined-up photos for the 360° view (scripts/make-spin.mjs)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Combo offers — a bundle of products at a special price

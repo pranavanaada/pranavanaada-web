@@ -23,6 +23,8 @@ export interface Product {
   images?: string[];
   /** Short muted video clip, shown as the last item in the product page gallery. */
   video?: string | null;
+  /** Lined-up photos from each side (front, side, back, other side) for the 360° view. */
+  spin?: string[];
   /** Weight/size options. Empty or missing = single price (`price`). */
   variants?: ProductVariant[];
   /** Short label shown on the product photo, e.g. "Stick included". */
