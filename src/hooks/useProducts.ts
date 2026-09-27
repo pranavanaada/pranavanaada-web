@@ -17,6 +17,13 @@ const listeners = new Set<() => void>();
 
 const FETCH_TIMEOUT_MS = 6000;
 
+/** AbortSignal.timeout() is missing on iPhones before iOS 16, so build it by hand. */
+function timeoutSignal(ms: number) {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
 async function fetchTable<T>(
   table: 'products' | 'combos',
   onlyVisible: boolean,
@@ -28,7 +35,7 @@ async function fetchTable<T>(
       // Public catalogue: a plain REST call, so visitors never download the Supabase SDK.
       const res = await fetch(`${supabaseUrl}/rest/v1/${table}?select=*&is_visible=eq.true`, {
         headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${supabaseAnonKey}` },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        signal: timeoutSignal(FETCH_TIMEOUT_MS),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as (T & { sort_order?: number })[];
@@ -38,7 +45,7 @@ async function fetchTable<T>(
     const { supabase } = await import('../lib/supabaseClient');
     let query = supabase.from(table).select('*');
     if (onlyVisible) query = query.eq('is_visible', true);
-    const { data, error } = await query.abortSignal(AbortSignal.timeout(FETCH_TIMEOUT_MS));
+    const { data, error } = await query.abortSignal(timeoutSignal(FETCH_TIMEOUT_MS));
     if (error || !data) throw error || new Error('No data');
     return { rows: sortProducts(data as (T & { sort_order?: number })[]) as T[], usingFallback: false };
   } catch {
