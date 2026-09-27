@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ADDRESS_LINES,
+  MAPS_LINK,
   BUSINESS_HOURS,
   BUSINESS_NAME,
   EMAIL,
@@ -180,10 +181,14 @@ export default function Footer() {
           <div className="space-y-3 text-sm text-cream/70">
             {(BUSINESS_NAME || ADDRESS_LINES.length > 0) && (
               <address className="not-italic leading-relaxed">
-                {BUSINESS_NAME && <div className="text-cream">{BUSINESS_NAME}</div>}
-                {ADDRESS_LINES.map((line) => (
-                  <div key={line}>{line}</div>
-                ))}
+                <a href={MAPS_LINK} target="_blank" rel="noopener noreferrer" className="block hover:text-gold transition-colors">
+                  {BUSINESS_NAME && <span className="block text-cream">{BUSINESS_NAME}</span>}
+                  {ADDRESS_LINES.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </a>
               </address>
             )}
             <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2.5 hover:text-gold transition-colors">

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { Product } from '../types/product';
 import { getVariants, productPath } from './productUtils';
-import { EMAIL, PHONE_TEL, SOCIAL_LINKS } from '../config/contact';
+import { EMAIL, PHONE_TEL, SOCIAL_LINKS, POSTAL_ADDRESS } from '../config/contact';
 
 /** Canonical site address (the www host is the one with a valid certificate). */
 export const SITE_URL = 'https://www.pranavanaada.com';
@@ -96,6 +96,7 @@ export const organizationJsonLd = () => ({
   logo: `${SITE_URL}/og-image.jpg`,
   email: EMAIL,
   telephone: PHONE_TEL,
+  address: POSTAL_ADDRESS,
   sameAs: Object.values(SOCIAL_LINKS).filter(Boolean),
 });
 

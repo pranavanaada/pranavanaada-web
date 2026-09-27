@@ -102,6 +102,14 @@ const HOME_JSONLD = [
     logo: `${SITE_URL}/apple-touch-icon.png`,
     email: 'pranavanaadaa@gmail.com',
     telephone: '+918050124365',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '1006, Kalahasti Nagar, Prashanth Nagar, T. Dasarahalli',
+      addressLocality: 'Bengaluru',
+      addressRegion: 'Karnataka',
+      postalCode: '560057',
+      addressCountry: 'IN',
+    },
     sameAs: [
       'https://www.instagram.com/pranavanaadaa_bells/',
       'https://www.facebook.com/share/1J2y1WPpSR/',

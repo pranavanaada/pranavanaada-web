@@ -16,7 +16,23 @@ export const PHONE_TEL = '+918050124365';
  * Fill in the registered business name, address lines and opening hours.
  */
 export const BUSINESS_NAME = '';
-export const ADDRESS_LINES: string[] = [];
+export const ADDRESS_LINES: string[] = [
+  '1006, Kalahasti Nagar, Prashanth Nagar',
+  'T. Dasarahalli, Bengaluru',
+  'Karnataka 560057',
+];
+
+/** Same address in the form search engines read (structured data). */
+export const POSTAL_ADDRESS = {
+  '@type': 'PostalAddress',
+  streetAddress: '1006, Kalahasti Nagar, Prashanth Nagar, T. Dasarahalli',
+  addressLocality: 'Bengaluru',
+  addressRegion: 'Karnataka',
+  postalCode: '560057',
+  addressCountry: 'IN',
+};
+
+export const MAPS_LINK = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS_LINES.join(', '))}`;
 export const BUSINESS_HOURS = '';
 
 export const SOCIAL_LINKS = {
