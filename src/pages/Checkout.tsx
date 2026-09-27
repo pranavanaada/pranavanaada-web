@@ -5,13 +5,13 @@ import { useLang } from '../i18n/useLang';
 import { useCart, itemLabel } from '../hooks/useCart';
 import { formatINR, sizeLabel } from '../lib/productUtils';
 import { WHATSAPP_WA_LINK } from '../config/contact';
+import { deliveryWindow } from '../lib/delivery';
 import { describeItems } from '../hooks/useCart';
 import {
   CheckoutError,
   DEFAULT_SETTINGS,
   INDIAN_STATES,
   createOrder,
-  earliestDeliveryDate,
   fetchStoreSettings,
   loadRazorpay,
   loadSavedDetails,
@@ -87,7 +87,18 @@ export default function Checkout() {
     fetchStoreSettings().then(setSettings);
   }, []);
 
-  const earliest = earliestDeliveryDate(settings.min_delivery_days);
+  // Bengaluru: same-day before 6 pm (else tomorrow); elsewhere the store's minimum days ahead
+  const delivery = deliveryWindow(customer.city, customer.pincode, settings.min_delivery_days);
+  const earliest = delivery.earliest;
+
+  // Bengaluru fills in the earliest date (today before 6 pm); a date that's too early for the address is cleared
+  useEffect(() => {
+    setCustomer((c) => {
+      if (delivery.bengaluru && (!c.deliveryDate || c.deliveryDate < earliest)) return { ...c, deliveryDate: earliest };
+      if (!delivery.bengaluru && c.deliveryDate && c.deliveryDate < earliest) return { ...c, deliveryDate: '' };
+      return c;
+    });
+  }, [delivery.bengaluru, earliest]);
   const subtotal = cart.total;
   const shipping = shippingFor(subtotal, settings);
   const total = subtotal + shipping;
@@ -351,7 +362,17 @@ export default function Checkout() {
                 />
                 <FieldError f="deliveryDate" />
               </div>
-              <p className="text-xs text-cream/45">{t('coDeliveryHint', { days: settings.min_delivery_days })}</p>
+              {delivery.bengaluru ? (
+                <p
+                  className={`text-sm rounded-lg px-3 py-2.5 border ${
+                    delivery.sameDay ? 'border-gold/50 bg-gold/10 text-gold-light' : 'border-emerald-700 bg-emerald-950/40 text-cream/70'
+                  }`}
+                >
+                  🚚 {delivery.sameDay ? t('coSameDay') : t('coSameDayLate')}
+                </p>
+              ) : (
+                <p className="text-xs text-cream/45">{t('coDeliveryHint', { days: settings.min_delivery_days })}</p>
+              )}
               <div>
                 <label className={label}>{t('coNotes')}</label>
                 <textarea rows={2} value={customer.notes} onChange={set('notes')} className={`${inputBase} border-emerald-700 resize-y`} />

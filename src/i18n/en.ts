@@ -109,6 +109,8 @@ const en = {
   errPincode: 'Enter a valid 6-digit PIN code',
   errGstin: 'GSTIN should be 15 letters and numbers',
   errDeliveryDate: 'Choose a date on or after {{date}}',
+  coSameDay: 'Same-day delivery in Bengaluru — order before 6 pm and receive it today. You can also choose a later date.',
+  coSameDayLate: 'Same-day delivery in Bengaluru is for orders placed before 6 pm. The earliest now is tomorrow.',
 
   // Order confirmation
   okTitle: 'Thank you! Your order is placed.',

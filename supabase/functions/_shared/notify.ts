@@ -3,6 +3,7 @@
 // secrets are set (see README → Order notifications), and every attempt is
 // recorded in orders.notifications so the admin can see what went out.
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
+import { isSameDayOrder } from './delivery.ts';
 
 interface OrderItem {
   type: 'product' | 'combo';
@@ -38,6 +39,7 @@ interface Order {
   total: number;
   payment_method: 'online' | 'cod';
   payment_status: string;
+  created_at: string;
 }
 
 interface Attempt {
@@ -200,7 +202,8 @@ function adminEmail(o: Order, siteUrl: string) {
       <a href="https://wa.me/${waNumber(o.phone)}" style="color:#25D366;">WhatsApp customer</a>
     </p>
   `);
-  return { subject: `🔔 New order ${o.order_number} — ${inr(o.total)} (${paid ? 'paid' : 'COD'})`, html };
+  const rush = isSameDayOrder(o.created_at, o.preferred_delivery_date) ? '⚡ SAME-DAY · ' : '';
+  return { subject: `${rush}🔔 New order ${o.order_number} — ${inr(o.total)} (${paid ? 'paid' : 'COD'})`, html };
 }
 
 // ---- Senders -----------------------------------------------------------------

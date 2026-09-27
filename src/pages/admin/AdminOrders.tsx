@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { formatINR } from '../../lib/productUtils';
 import { inputClass } from './AdminProductForm';
+import { isSameDayOrder } from '../../lib/delivery';
 
 interface OrderItem {
   type: 'product' | 'combo';
@@ -243,6 +244,9 @@ This was pay on delivery — it will also record ${formatINR(o.total)} as receiv
                     {new Date(o.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                   <span className="flex-1" />
+                  {TO_DELIVER.includes(o.status) && isSameDayOrder(o.created_at, o.preferred_delivery_date) && (
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-kumkum text-cream">⚡ Same-day</span>
+                  )}
                   <span className={`text-xs px-2.5 py-1 rounded-full ${pay.cls}`}>{pay.text}</span>
                   <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-950/70 text-cream/80">{STATUS_LABEL[o.status]}</span>
                   <span className="text-gold font-semibold">{formatINR(o.total)}</span>

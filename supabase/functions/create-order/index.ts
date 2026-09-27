@@ -3,6 +3,7 @@
 // order, and for "Pay Now" creates the matching Razorpay order.
 import { adminClient, corsHeaders, env, json, PUBLIC_ORDER_FIELDS } from '../_shared/common.ts';
 import { notifyInBackground } from '../_shared/notify.ts';
+import { earliestDelivery } from '../_shared/delivery.ts';
 
 type CartLine =
   | { type: 'product'; product_id: string; variant?: string; qty: number }
@@ -48,11 +49,9 @@ function validateCustomer(c: Record<string, unknown>, minDays: number) {
   if (!/^[1-9]\d{5}$/.test(out.pincode)) errors.push('pincode');
   if (out.gstin && !/^[0-9A-Z]{15}$/.test(out.gstin)) errors.push('gstin');
   if (out.preferred_delivery_date) {
-    const earliest = new Date();
-    earliest.setHours(0, 0, 0, 0);
-    earliest.setDate(earliest.getDate() + minDays);
-    const chosen = new Date(`${out.preferred_delivery_date}T00:00:00`);
-    if (isNaN(chosen.getTime()) || chosen < earliest) errors.push('deliveryDate');
+    // Bengaluru: same day before 6 pm (India time), else tomorrow; elsewhere minDays ahead
+    const valid = /^\d{4}-\d{2}-\d{2}$/.test(out.preferred_delivery_date);
+    if (!valid || out.preferred_delivery_date < earliestDelivery(out.city, out.pincode, minDays)) errors.push('deliveryDate');
   } else {
     errors.push('deliveryDate');
   }
