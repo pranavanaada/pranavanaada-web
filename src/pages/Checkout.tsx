@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLang } from '../i18n/useLang';
@@ -47,7 +47,7 @@ const EMPTY: CheckoutCustomer = {
 type Field = 'name' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'pincode' | 'gstin' | 'deliveryDate';
 
 const inputBase =
-  'w-full bg-emerald-950 border rounded-md px-3 py-2.5 text-sm outline-none transition-colors focus:border-gold';
+  'w-full bg-emerald-950 border rounded-md px-3 py-2.5 text-sm outline-none transition-colors focus:border-neela-light focus:ring-2 focus:ring-neela/40';
 
 /** Same rules as the create-order function, so most mistakes are caught before sending. */
 function validate(c: CheckoutCustomer, earliest: string): Field[] {
@@ -228,13 +228,14 @@ export default function Checkout() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 py-12">
-      <h1 className="font-heading text-gold text-3xl mb-8">{t('coTitle')}</h1>
+      <h1 className="font-heading text-gold text-3xl">{t('coTitle')}</h1>
+      <TempleBand className="w-28 mt-3 mb-8" />
 
       <form onSubmit={handleSubmit} noValidate className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
         <div className="space-y-6">
           {/* Contact */}
           <section className={cardClass}>
-            <h2 className="font-heading text-cream text-lg mb-4">1. {t('coContact')}</h2>
+            <StepTitle n={1}>{t('coContact')}</StepTitle>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2" data-first-error={firstError === 'name' || undefined}>
                 <label className={label}>{t('coFullName')}</label>
@@ -268,7 +269,7 @@ export default function Checkout() {
 
           {/* Address */}
           <section className={cardClass}>
-            <h2 className="font-heading text-cream text-lg mb-4">2. {t('coAddress')}</h2>
+            <StepTitle n={2}>{t('coAddress')}</StepTitle>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2" data-first-error={firstError === 'address' || undefined}>
                 <label className={label}>{t('coAddress1')}</label>
@@ -334,7 +335,7 @@ export default function Checkout() {
 
           {/* Delivery */}
           <section className={cardClass}>
-            <h2 className="font-heading text-cream text-lg mb-4">3. {t('coDelivery')}</h2>
+            <StepTitle n={3}>{t('coDelivery')}</StepTitle>
             <div className="space-y-4">
               <div className="max-w-xs" data-first-error={firstError === 'deliveryDate' || undefined}>
                 <label className={label}>{t('coDeliveryDate')}</label>
@@ -373,11 +374,11 @@ export default function Checkout() {
 
           {/* Payment */}
           <section className={cardClass}>
-            <h2 className="font-heading text-cream text-lg mb-4">4. {t('coPayment')}</h2>
+            <StepTitle n={4}>{t('coPayment')}</StepTitle>
             <div role="radiogroup" className="grid sm:grid-cols-2 gap-3">
               {(
                 [
-                  { key: 'online', title: t('coPayNow'), hint: t('coPayNowHint'), enabled: onlineAllowed, icon: '💳' },
+                  { key: 'online', title: t('coPayNow'), hint: t('coPayNowHint'), enabled: onlineAllowed, icon: '💳', tone: 'neela' },
                   {
                     key: 'cod',
                     title: t('coCod'),
@@ -388,10 +389,12 @@ export default function Checkout() {
                         : t('coUnavailable'),
                     enabled: codAllowed,
                     icon: '🚚',
+                    tone: 'kumkum',
                   },
                 ] as const
               ).map((m) => {
                 const active = method === m.key;
+                const tone = PAY_TONES[m.tone];
                 return (
                   <button
                     key={m.key}
@@ -401,14 +404,14 @@ export default function Checkout() {
                     disabled={!m.enabled}
                     onClick={() => setMethod(m.key)}
                     className={`relative text-left rounded-xl border p-4 transition-colors disabled:opacity-45 disabled:cursor-not-allowed ${
-                      active ? 'border-gold bg-gold/10' : 'border-emerald-700 hover:border-gold/50'
+                      active ? tone.active : `border-emerald-700 ${tone.hover}`
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${active ? 'border-gold' : 'border-cream/40'}`}
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${active ? tone.ring : 'border-cream/40'}`}
                       >
-                        {active && <span className="w-2 h-2 rounded-full bg-gold" />}
+                        {active && <span className={`w-2 h-2 rounded-full ${tone.dot}`} />}
                       </span>
                       <span className="text-cream font-medium">
                         {m.icon} {m.title}
@@ -419,12 +422,13 @@ export default function Checkout() {
                 );
               })}
             </div>
-            {method === 'online' && <p className="text-[11px] text-cream/40 mt-3">🔒 {t('coSecure')}</p>}
+            {method === 'online' && <p className="text-[11px] text-neela-light/80 mt-3">🔒 {t('coSecure')}</p>}
           </section>
         </div>
 
         {/* Summary */}
-        <aside className={`${cardClass} lg:sticky lg:top-24`}>
+        <aside className={`${cardClass} relative overflow-hidden lg:sticky lg:top-24`}>
+          <TempleBand className="absolute inset-x-0 top-0 rounded-none" />
           <h2 className="font-heading text-cream text-lg mb-4">{t('coSummary')}</h2>
           <ul className="space-y-3 mb-4 max-h-[40vh] overflow-y-auto pr-1">
             {cart.items.map((i) => (
@@ -497,5 +501,27 @@ export default function Checkout() {
         </aside>
       </form>
     </div>
+  );
+}
+
+/** Selected / hover styles for the two payment choices: blue for paying online, kumkum red for cash on delivery. */
+const PAY_TONES = {
+  neela: { active: 'border-neela-light bg-neela/20', hover: 'hover:border-neela-light/60', ring: 'border-neela-light', dot: 'bg-neela-light' },
+  kumkum: { active: 'border-kumkum-light bg-kumkum/20', hover: 'hover:border-kumkum-light/60', ring: 'border-kumkum-light', dot: 'bg-kumkum-light' },
+} as const;
+
+/** Thin kumkum → gold → blue band, like a temple thoran. */
+function TempleBand({ className = '' }: { className?: string }) {
+  return <div aria-hidden className={`h-1 rounded-full bg-gradient-to-r from-kumkum via-gold to-neela ${className}`} />;
+}
+
+function StepTitle({ n, children }: { n: number; children: ReactNode }) {
+  return (
+    <h2 className="font-heading text-cream text-lg mb-4 flex items-center gap-3">
+      <span className="w-7 h-7 shrink-0 rounded-full bg-kumkum text-cream font-body text-sm font-semibold flex items-center justify-center shadow-[0_0_0_3px_rgba(184,51,42,0.2)]">
+        {n}
+      </span>
+      {children}
+    </h2>
   );
 }

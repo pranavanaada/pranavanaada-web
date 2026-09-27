@@ -16,6 +16,9 @@ export default {
           dark: '#a8823a',
         },
         cream: '#f4ede1',
+        // Temple accents, used sparingly (checkout): kumkum red and peacock blue
+        kumkum: { light: '#e0675c', DEFAULT: '#b8332a' },
+        neela: { light: '#86a9e8', DEFAULT: '#2a5caa' },
       },
       fontFamily: {
         // Kannada fallbacks: Latin text keeps Cinzel/Outfit, Kannada glyphs use these
