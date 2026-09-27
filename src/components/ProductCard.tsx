@@ -16,6 +16,8 @@ import {
   productName,
   productPath,
   sizeLabel,
+  scaleStyle,
+  sizeScale,
 } from '../lib/productUtils';
 import { fadeUp } from './motion';
 import ImageLightbox from './ImageLightbox';
@@ -44,6 +46,8 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
   const multi = hasVariants(product);
   // Start on the first weight that's in stock
   const [selected, setSelected] = useState(() => firstAvailableIndex(product));
+  // Cards show the photo full size until the visitor picks a weight themselves
+  const [picked, setPicked] = useState(false);
   const variant = variants[Math.min(selected, variants.length - 1)];
   // "In list" reflects the currently selected weight
   const inCart = cart.has(product.id, multi ? variant : undefined);
@@ -51,6 +55,8 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
   const badge = productBadge(product, lang);
   const soldOut = !isProductAvailable(product);
   const available = isVariantAvailable(product, multi ? variant : undefined);
+  // Once a weight is picked, the photo grows/shrinks to scale with the largest one
+  const scale = multi && picked ? sizeScale(product, variant) : 1;
 
   return (
     <motion.div
@@ -80,18 +86,20 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
               loaded ? 'opacity-100' : 'opacity-0'
             }`}
           />
-          <img
-            src={product.thumb || product.image}
-            alt={name}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            onLoad={() => setLoaded(true)}
-            className={`relative w-full h-full object-contain transition-[transform,opacity] duration-700 ease-out group-hover:scale-105 ${
-              soldOut ? 'grayscale-[60%] brightness-75' : ''
-            } ${
-              loaded ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
+          <span className="relative block w-full h-full origin-[50%_85%] transition-transform duration-500 ease-out" style={scaleStyle(scale)}>
+            <img
+              src={product.thumb || product.image}
+              alt={name}
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+              onLoad={() => setLoaded(true)}
+              className={`w-full h-full object-contain transition-[transform,opacity] duration-700 ease-out group-hover:scale-105 ${
+                soldOut ? 'grayscale-[60%] brightness-75' : ''
+              } ${
+                loaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </span>
         </Link>
         {soldOut && (
           <span className="absolute inset-x-0 bottom-0 bg-emerald-950/85 backdrop-blur text-cream text-xs font-semibold uppercase tracking-widest text-center py-2 pointer-events-none">
@@ -139,7 +147,10 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
             <VariantPicker
               variants={variants}
               selected={selected}
-              onSelect={setSelected}
+              onSelect={(i) => {
+                setSelected(i);
+                setPicked(true);
+              }}
               layoutGroup={product.id}
             />
             {variant.size && <div className="card-size hidden sm:block text-[11px] text-cream/40 mt-1.5">{sizeLabel(variant.size, lang)}</div>}

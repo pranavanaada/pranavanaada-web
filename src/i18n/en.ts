@@ -184,6 +184,7 @@ const en = {
   spinLabel: '360° view of {{name}} — drag or use the arrow keys to turn it',
   spinHint: 'Drag to turn',
   spinThumb: '360° view',
+  shownToScale: 'Photo shown to scale: {{size}}',
   backToShop: '← Back to Shop',
   productNotFound: 'Product not found.',
   photoOf: 'Photo {{n}} of {{total}}',

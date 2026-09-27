@@ -188,6 +188,7 @@ const kn: Record<keyof typeof en, string> = {
   spinLabel: '{{name}} – 360° ನೋಟ. ತಿರುಗಿಸಲು ಎಳೆಯಿರಿ ಅಥವಾ ಬಾಣದ ಕೀಲಿಗಳನ್ನು ಬಳಸಿ',
   spinHint: 'ತಿರುಗಿಸಲು ಎಳೆಯಿರಿ',
   spinThumb: '360° ನೋಟ',
+  shownToScale: 'ಚಿತ್ರವನ್ನು ಅಳತೆಗೆ ತಕ್ಕಂತೆ ತೋರಿಸಲಾಗಿದೆ: {{size}}',
   backToShop: '← ಉತ್ಪನ್ನಗಳಿಗೆ ಹಿಂತಿರುಗಿ',
   productNotFound: 'ಉತ್ಪನ್ನ ಕಂಡುಬಂದಿಲ್ಲ.',
   photoOf: 'ಚಿತ್ರ {{n}} / {{total}}',

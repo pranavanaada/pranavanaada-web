@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Product, ProductVariant } from '../types/product';
 
 export type Lang = 'en' | 'kn';
@@ -5,6 +6,35 @@ export type Lang = 'en' | 'kn';
 export const formatINR = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
 /** The product's weight options, or a single implicit option for single-price products. */
+/** Largest measurement in inches, e.g. "9 in tall · 5 in wide" → 9 (0 when there isn't one). */
+const inches = (size?: string) => Math.max(0, ...[...(size ?? '').matchAll(/([\d.]+)\s*in\b/gi)].map((m) => parseFloat(m[1])));
+
+/**
+ * How big this weight looks next to the product's largest weight (1 = largest), from the
+ * sizes the admin entered — so the photo can be shown to scale when a weight is picked.
+ */
+export function sizeScale(product: Product, variant?: ProductVariant) {
+  const max = Math.max(0, ...getVariants(product).map((v) => inches(v.size)));
+  const cur = inches(variant?.size);
+  return max && cur ? Math.min(1, cur / max) : 1;
+}
+
+/**
+ * Style for a photo shown at `scale`: it shrinks toward its base, and its edges fade out so a
+ * smaller photo blends into the background instead of showing a hard rectangle.
+ */
+export function scaleStyle(scale: number): CSSProperties {
+  if (scale >= 0.999) return { transform: 'scale(1)' };
+  const fade = 'linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent), linear-gradient(to right, transparent, #000 9%, #000 91%, transparent)';
+  return {
+    transform: `scale(${scale})`,
+    maskImage: fade,
+    WebkitMaskImage: fade,
+    maskComposite: 'intersect',
+    WebkitMaskComposite: 'source-in',
+  };
+}
+
 export function getVariants(product: Product): ProductVariant[] {
   const list = Array.isArray(product.variants) ? product.variants.filter((v) => v && v.label) : [];
   return list.length > 0 ? list : [{ label: '', price: product.price }];

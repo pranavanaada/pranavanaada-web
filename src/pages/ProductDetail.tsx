@@ -26,6 +26,8 @@ import {
   productName,
   sizeLabel,
   weightLabel,
+  scaleStyle,
+  sizeScale,
 } from '../lib/productUtils';
 import { useSeo, productSeo } from '../lib/seo';
 
@@ -84,6 +86,9 @@ export default function ProductDetail() {
   const showSpin = hasSpin && photo === SPIN;
   const showVideo = !!product.video && photo === gallery.length;
   const currentPhoto = gallery[Math.min(Math.max(photo, 0), gallery.length - 1)];
+  // The main photo and 360° view resize with the picked weight (close-ups and the video don't)
+  const scale = multi ? sizeScale(product, variant) : 1;
+  const toScale = showSpin || (!showVideo && currentPhoto === product.image);
   // Everything of this product in the list, across all weights
   const inList = cart.items.filter((i) => i.id === product.id);
   const name = productName(product, lang);
@@ -105,7 +110,7 @@ export default function ProductDetail() {
             transition={{ duration: 0.2 }}
           >
             {showSpin ? (
-              <SpinViewer frames={spin} alt={name} badge={productBadge(product, lang)} />
+              <SpinViewer frames={spin} alt={name} badge={productBadge(product, lang)} scale={scale} />
             ) : showVideo && product.video ? (
               // Only downloaded once the visitor picks the video thumbnail.
               <video
@@ -124,6 +129,7 @@ export default function ProductDetail() {
               />
             ) : (
               <MagnifyImage
+                scale={toScale ? scale : 1}
                 src={currentPhoto}
                 placeholder={currentPhoto === product.image ? product.thumb ?? undefined : undefined}
                 alt={name}
@@ -133,6 +139,12 @@ export default function ProductDetail() {
             )}
           </motion.div>
         </AnimatePresence>
+
+        {toScale && multi && variant.size && (
+          <p className="text-[11px] text-cream/45 mt-2 text-center">
+            {t('shownToScale', { size: `${weightLabel(variant.label, lang)} · ${sizeLabel(variant.size, lang)}` })}
+          </p>
+        )}
 
         {(gallery.length > 1 || product.video || hasSpin) && (
           <div className="flex flex-wrap gap-3 mt-3">
@@ -341,7 +353,10 @@ function MagnifyImage({
   alt,
   badge,
   onOpen,
+  scale = 1,
 }: {
+  /** Size of the picked weight next to the largest (1 = largest) */
+  scale?: number;
   src: string;
   placeholder?: string;
   alt: string;
@@ -375,19 +390,21 @@ function MagnifyImage({
           instantly (slightly blurred) while the full-size image loads. */}
       {/* Blurred copy fills any space around photos that aren't 3:4 (e.g. the gong on its own) */}
       <img src={placeholder || src} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl brightness-90" />
-      {placeholder && !fullLoaded && (
-        <img src={placeholder} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain blur-sm" />
-      )}
-      <img
-        src={src}
-        alt={alt}
-        decoding="async"
-        onLoad={() => setFullLoaded(true)}
-        className={`relative w-full h-full object-contain transition-[transform,opacity] duration-300 ease-out ${
-          fullLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ transformOrigin: origin, transform: hovering ? 'scale(2)' : 'scale(1)' }}
-      />
+      <span className="relative block w-full h-full origin-[50%_85%] transition-transform duration-500 ease-out" style={scaleStyle(scale)}>
+        {placeholder && !fullLoaded && (
+          <img src={placeholder} alt="" aria-hidden className="absolute inset-0 w-full h-full object-contain blur-sm" />
+        )}
+        <img
+          src={src}
+          alt={alt}
+          decoding="async"
+          onLoad={() => setFullLoaded(true)}
+          className={`relative w-full h-full object-contain transition-[transform,opacity] duration-300 ease-out ${
+            fullLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ transformOrigin: origin, transform: hovering ? 'scale(2)' : 'scale(1)' }}
+        />
+      </span>
       {badge && (
         <span className="absolute top-3 left-3 bg-emerald-950/85 backdrop-blur text-gold-light border border-gold/40 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full pointer-events-none">
           {badge}

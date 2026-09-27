@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLang } from '../i18n/useLang';
+import { scaleStyle } from '../lib/productUtils';
 
 const HOLD_MS = 1100; // how long each view rests before turning
 const TURN_MS = 700; // how long the turn to the next view takes
@@ -14,7 +15,18 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
  * It turns slowly on its own; visitors can drag/swipe or use the arrow keys to turn it.
  * Neighbouring views blend into each other, so the turn looks continuous.
  */
-export default function SpinViewer({ frames, alt, badge }: { frames: string[]; alt: string; badge?: string | null }) {
+export default function SpinViewer({
+  frames,
+  alt,
+  badge,
+  scale = 1,
+}: {
+  frames: string[];
+  alt: string;
+  badge?: string | null;
+  /** Size of the picked weight next to the largest (1 = largest) */
+  scale?: number;
+}) {
   const { t } = useLang();
   const n = frames.length;
   const [pos, setPos] = useState(0); // position in "frames": 1.5 = halfway between view 2 and view 3
@@ -103,8 +115,10 @@ export default function SpinViewer({ frames, alt, badge }: { frames: string[]; a
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onKeyDown={onKeyDown}
-      className="group relative block w-full aspect-[3/4] rounded-xl overflow-hidden bg-emerald-950 border border-emerald-800 cursor-grab active:cursor-grabbing select-none touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      className="group relative block w-full aspect-[3/4] rounded-xl overflow-hidden bg-[rgb(1,67,47)] border border-emerald-800 cursor-grab active:cursor-grabbing select-none touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-gold"
     >
+      {/* Frames sit on plain felt green, the same colour as this box, so a smaller size blends in */}
+      <span className="absolute inset-0 origin-[50%_85%] transition-transform duration-500 ease-out" style={scaleStyle(scale)}>
       {frames.map((src, i) => (
         <img
           key={src}
@@ -116,6 +130,7 @@ export default function SpinViewer({ frames, alt, badge }: { frames: string[]; a
           style={{ opacity: i === base ? 1 : i === next ? blend : 0, zIndex: i === next ? 2 : i === base ? 1 : 0 }}
         />
       ))}
+      </span>
       {badge && (
         <span className="absolute z-10 top-3 left-3 bg-emerald-950/85 backdrop-blur text-gold-light border border-gold/40 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full pointer-events-none">
           {badge}
