@@ -73,6 +73,7 @@ export default function AdminProductForm() {
   const [images, setImages] = useState<ManagedImage[]>([]);
   const [video, setVideo] = useState<string | null>(null);
   const [videoBusy, setVideoBusy] = useState(false);
+  const [spin, setSpin] = useState<string[]>([]);
   const [inStock, setInStock] = useState(true);
   const [visible, setVisible] = useState(true);
   const [featured, setFeatured] = useState(false);
@@ -110,6 +111,7 @@ export default function AdminProductForm() {
           }))
         );
         setVideo(p.video ?? null);
+        setSpin(p.spin ?? []);
         setImages([
           ...(p.image ? [{ url: p.image, thumb: p.thumb }] : []),
           ...(p.images || []).map((url) => ({ url })),
@@ -167,6 +169,7 @@ export default function AdminProductForm() {
       image: main.url,
       thumb: main.thumb || null,
       video,
+      spin,
       images: extras.map((i) => i.url),
       in_stock: inStock,
       is_visible: visible,
@@ -277,6 +280,39 @@ export default function AdminProductForm() {
               </label>
             )}
           </div>
+        </Section>
+
+        <Section title="360° view">
+          {spin.length > 0 ? (
+            <div className="space-y-3">
+              <div className="text-xs text-cream/50">
+                Shown first on the product page; turns through these {spin.length} views in order.
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {spin.map((url, i) => (
+                  <div key={url} className="relative">
+                    <img src={url} alt={`360° view ${i + 1}`} className="w-20 h-24 object-cover rounded-md border border-emerald-700" />
+                    <span className="absolute bottom-1 left-1 text-[10px] bg-emerald-950/80 text-cream/80 px-1.5 rounded">{i + 1}</span>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Remove the 360° view from this product? The product page will open on the main photo instead.')) setSpin([]);
+                }}
+                className="text-xs text-red-300 hover:underline"
+              >
+                Remove 360° view
+              </button>
+              <p className="text-[11px] text-cream/40">Takes effect when you save the product.</p>
+            </div>
+          ) : (
+            <p className="text-xs text-cream/50">
+              No 360° view. To add one, send photos of the bell from each side (front, side, back, other side) on the green
+              cloth — they're lined up and placed on the felt background automatically.
+            </p>
+          )}
         </Section>
 
         <Section title="Price & weights">
