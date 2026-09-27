@@ -15,9 +15,9 @@ interface Props {
 /** Weight chips (1 kg · 1.5 kg · 2 kg) with a highlight that slides to the chosen one. */
 export default function VariantPicker({ variants, selected, onSelect, layoutGroup, size = 'sm' }: Props) {
   const { t, lang } = useLang();
-  const chip = size === 'md' ? 'text-sm px-4 py-2' : 'text-xs px-3 py-1.5';
+  const chip = size === 'md' ? 'text-sm px-4 py-2' : 'text-[11px] px-2 py-1 sm:text-xs sm:px-3 sm:py-1.5';
   return (
-    <div role="radiogroup" aria-label={t('weight')} className="flex flex-wrap gap-2">
+    <div role="radiogroup" aria-label={t('weight')} className="flex flex-wrap gap-1.5 sm:gap-2">
       {variants.map((v, i) => {
         const active = i === selected;
         return (

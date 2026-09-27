@@ -98,7 +98,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
           </span>
         )}
         {badge && (
-          <span className="absolute top-3 left-3 bg-emerald-950/85 backdrop-blur text-gold-light border border-gold/40 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full pointer-events-none">
+          <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-emerald-950/85 backdrop-blur text-gold-light border border-gold/40 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full pointer-events-none">
             {badge}
           </span>
         )}
@@ -106,13 +106,13 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
           type="button"
           onClick={() => setZoomOpen(true)}
           aria-label={t('zoomProduct', { name })}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-emerald-950/70 backdrop-blur border border-emerald-700 text-cream flex items-center justify-center opacity-100 md:opacity-0 md:translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:border-gold hover:text-gold transition-all duration-300"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-950/70 backdrop-blur border border-emerald-700 text-cream flex items-center justify-center opacity-100 md:opacity-0 md:translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:border-gold hover:text-gold transition-all duration-300"
         >
           <ZoomIcon />
         </button>
       </div>
-      <div className="p-4 flex flex-col flex-1">
-        <Link to={`/shop/${product.id}`} className="font-medium text-sm mb-1 hover:text-gold transition-colors">
+      <div className="p-2.5 sm:p-4 flex flex-col flex-1">
+        <Link to={`/shop/${product.id}`} className="font-medium text-[13px] sm:text-sm leading-snug mb-1 line-clamp-2 hover:text-gold transition-colors">
           {name}
         </Link>
         {/* Price follows the chosen weight */}
@@ -130,25 +130,27 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
             </motion.span>
           </AnimatePresence>
         </div>
-        <p className="text-xs text-cream/60 leading-relaxed mb-3 flex-1 line-clamp-2">{productDescription(product, lang)}</p>
+        {/* Description is on the product page; hidden on phones to keep cards compact */}
+        <p className="hidden sm:block text-xs text-cream/60 leading-relaxed mb-3 flex-1 line-clamp-2">{productDescription(product, lang)}</p>
+        <div className="flex-1 sm:hidden" aria-hidden />
         {multi && (
-          <div className="mb-4">
+          <div className="mb-2.5 sm:mb-4">
             <VariantPicker
               variants={variants}
               selected={selected}
               onSelect={setSelected}
               layoutGroup={product.id}
             />
-            {variant.size && <div className="text-[11px] text-cream/40 mt-1.5">{sizeLabel(variant.size, lang)}</div>}
+            {variant.size && <div className="hidden sm:block text-[11px] text-cream/40 mt-1.5">{sizeLabel(variant.size, lang)}</div>}
           </div>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           {!available ? (
             <button
               type="button"
               disabled
               title={multi ? t('weightOutOfStock') : t('outOfStock')}
-              className="flex-1 text-center leading-tight text-xs font-semibold uppercase tracking-wide py-2.5 rounded-md border border-emerald-700 text-cream/40 cursor-not-allowed"
+              className="flex-1 text-center leading-tight text-[10px] sm:text-xs font-semibold uppercase sm:tracking-wide py-2 sm:py-2.5 rounded-md border border-emerald-700 text-cream/40 cursor-not-allowed"
             >
               {t('outOfStock')}
             </button>
@@ -156,7 +158,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => (inCart ? cart.open() : cart.add(product, multi ? variant : undefined))}
-            className={`flex-1 flex items-center justify-center gap-1.5 text-center leading-tight text-xs font-semibold uppercase tracking-wide py-2.5 rounded-md transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1.5 text-center leading-tight text-[11px] sm:text-xs font-semibold uppercase sm:tracking-wide py-2 sm:py-2.5 rounded-md transition-colors ${
               inCart
                 ? 'border border-gold text-gold hover:bg-gold/10'
                 : 'bg-gold text-emerald-950 hover:bg-gold-light'
@@ -170,7 +172,15 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.15 }}
               >
-                {inCart ? `✓ ${t('inList')}` : `+ ${t('addToEnquiry')}`}
+                {inCart ? (
+                  `✓ ${t('inList')}`
+                ) : (
+                  <>
+                    {/* Short label on phones where cards are narrow */}
+                    <span className="sm:hidden">+ {t('addShort')}</span>
+                    <span className="hidden sm:inline">+ {t('addToEnquiry')}</span>
+                  </>
+                )}
               </motion.span>
             </AnimatePresence>
           </motion.button>
@@ -180,7 +190,7 @@ export default function ProductCard({ product, onEnquire, priority = false }: Pr
             onClick={() => onEnquire(product, multi ? variant : undefined)}
             aria-label={`${available ? t('enquireNow') : t('askAvailability')}: ${name}`}
             title={available ? t('enquireNow') : t('askAvailability')}
-            className="shrink-0 w-10 flex items-center justify-center rounded-md border border-emerald-700 text-cream/70 hover:border-gold hover:text-gold transition-colors"
+            className="shrink-0 w-8 sm:w-10 flex items-center justify-center rounded-md border border-emerald-700 text-cream/70 hover:border-gold hover:text-gold transition-colors"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden>
               <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />

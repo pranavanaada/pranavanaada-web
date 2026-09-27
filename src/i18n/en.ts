@@ -176,6 +176,7 @@ const en = {
   viewDetails: 'View Details',
   enquireNow: 'Enquire Now',
   addToEnquiry: 'Add to Enquiry',
+  addShort: 'Add',
   inList: 'In List',
   zoomProduct: 'Zoom {{name}}',
   tapToZoom: 'Tap to zoom',

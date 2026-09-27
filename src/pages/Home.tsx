@@ -229,7 +229,7 @@ export default function Home() {
         </Reveal>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl overflow-hidden border border-emerald-800">
                 <div className="aspect-square shimmer" />
@@ -242,7 +242,7 @@ export default function Home() {
           </div>
         ) : (
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5"
             variants={stagger(0.1)}
             initial="hidden"
             whileInView="show"

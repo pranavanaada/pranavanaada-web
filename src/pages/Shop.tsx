@@ -91,7 +91,7 @@ export default function Shop() {
           ))}
         </div>
       ) : loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-xl overflow-hidden border border-emerald-800">
               <div className="aspect-square shimmer" />
@@ -105,7 +105,7 @@ export default function Shop() {
       ) : filtered.length === 0 ? (
         <div className="text-center text-cream/50 py-16">{t('noProducts')}</div>
       ) : (
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <motion.div layout className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
           <AnimatePresence mode="popLayout">
             {filtered.map((p, i) => (
               <motion.div

@@ -180,6 +180,7 @@ const kn: Record<keyof typeof en, string> = {
   viewDetails: 'ವಿವರಗಳನ್ನು ನೋಡಿ',
   enquireNow: 'ಈಗ ವಿಚಾರಿಸಿ',
   addToEnquiry: 'ವಿಚಾರಣೆಗೆ ಸೇರಿಸಿ',
+  addShort: 'ಸೇರಿಸಿ',
   inList: 'ಪಟ್ಟಿಯಲ್ಲಿದೆ',
   zoomProduct: '{{name}} ದೊಡ್ಡದಾಗಿ ನೋಡಿ',
   tapToZoom: 'ದೊಡ್ಡದಾಗಿ ನೋಡಲು ಒತ್ತಿ',
