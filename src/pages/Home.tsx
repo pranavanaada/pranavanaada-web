@@ -166,7 +166,7 @@ export default function Home() {
           </motion.div>
           <motion.h1
             variants={fadeUp}
-            className="font-heading text-5xl md:text-7xl lg:text-6xl font-semibold tracking-wide leading-tight mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
+            className="font-heading text-[clamp(1.75rem,8.5vw,3rem)] sm:text-6xl md:text-7xl lg:text-6xl font-semibold sm:tracking-wide leading-tight whitespace-nowrap mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
           >
             {t('heroTitle')}
           </motion.h1>
