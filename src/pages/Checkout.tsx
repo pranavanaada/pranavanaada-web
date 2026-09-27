@@ -79,6 +79,9 @@ export default function Checkout() {
   const [showGst, setShowGst] = useState(!!customer.gstin);
   // A saved online order waiting for payment (after cancel/failure) — retry reuses it.
   const [pending, setPending] = useState<{ key: string; orderId: string; amount: number; orderNumber: string } | null>(null);
+  // A started-but-unpaid online order is for the list as it was; if the list changes, the next
+  // "Place order" creates a fresh order instead of retrying the old amount.
+  useEffect(() => setPending(null), [cart.items]);
 
   useEffect(() => {
     fetchStoreSettings().then(setSettings);
@@ -440,7 +443,40 @@ export default function Checkout() {
                   {i.combo && (
                     <div className="text-[11px] text-cream/40">{lang === 'kn' ? i.combo.includes_kn : i.combo.includes}</div>
                   )}
-                  <div className="text-xs text-cream/50">× {i.qty}</div>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    <div className="flex items-center rounded-md border border-emerald-700">
+                      <button
+                        type="button"
+                        onClick={() => cart.setQty(i.key, i.qty - 1)}
+                        disabled={busy || i.qty <= 1}
+                        aria-label={t('decreaseQty')}
+                        className="w-8 h-8 text-cream/70 hover:text-gold disabled:opacity-30 transition-colors"
+                      >
+                        −
+                      </button>
+                      <span className="w-6 text-center text-xs text-cream" aria-live="polite">
+                        {i.qty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => cart.setQty(i.key, i.qty + 1)}
+                        disabled={busy}
+                        aria-label={t('increaseQty')}
+                        className="w-8 h-8 text-cream/70 hover:text-gold disabled:opacity-30 transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => cart.remove(i.key)}
+                      disabled={busy}
+                      aria-label={t('removeItem', { name: itemLabel(i, lang) })}
+                      className="text-xs text-kumkum-light hover:underline underline-offset-4 disabled:opacity-40"
+                    >
+                      {t('remove')}
+                    </button>
+                  </div>
                 </div>
                 <div className="text-sm text-cream/80 shrink-0">{formatINR(i.price * i.qty)}</div>
               </li>
