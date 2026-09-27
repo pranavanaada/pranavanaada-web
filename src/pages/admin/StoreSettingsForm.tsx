@@ -84,10 +84,6 @@ export default function StoreSettingsForm() {
           <input type="number" min="0" value={s.free_shipping_above} onChange={num('free_shipping_above')} className={inputClass} />
           <p className="text-[11px] text-cream/40 mt-1">0 = always charge the delivery fee.</p>
         </div>
-        <div>
-          <label className="block text-xs text-cream/50 mb-1">Earliest delivery (days after order)</label>
-          <input type="number" min="0" value={s.min_delivery_days} onChange={num('min_delivery_days')} className={inputClass} />
-        </div>
       </div>
 
       {message && <p className={`text-xs ${message.ok ? 'text-emerald-200' : 'text-red-400'}`}>{message.text}</p>}

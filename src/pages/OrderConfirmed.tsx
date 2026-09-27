@@ -6,6 +6,7 @@ import { formatINR } from '../lib/productUtils';
 import { recallOrder } from '../lib/checkout';
 import { WHATSAPP_WA_LINK } from '../config/contact';
 import { useSeo } from '../lib/seo';
+import { formatDeliveryRange } from '../lib/delivery';
 
 /** Shown after a successful order (COD placed, or online payment verified). */
 export default function OrderConfirmed() {
@@ -102,7 +103,7 @@ export default function OrderConfirmed() {
               <div>
                 <div className="text-xs text-cream/50 mb-1">{t('okPreferred')}</div>
                 <div className="text-cream/80">
-                  {new Date(`${order.preferred_delivery_date}T00:00:00`).toLocaleDateString('en-IN', { dateStyle: 'long' })}
+                  {formatDeliveryRange(order.delivery_from, order.preferred_delivery_date)}
                 </div>
               </div>
             )}

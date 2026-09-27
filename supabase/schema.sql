@@ -228,6 +228,7 @@ create index if not exists orders_created_at_idx on orders (created_at desc);
 alter table orders add column if not exists notified_at timestamptz;
 alter table orders add column if not exists notifications jsonb not null default '[]';
 alter table orders add column if not exists delivered_at timestamptz;   -- set when the admin marks it delivered (sales totals)
+alter table orders add column if not exists delivery_from date;        -- expected delivery window: delivery_from … preferred_delivery_date (set from the address)
 
 alter table orders enable row level security;
 drop policy if exists "Admins can view orders" on orders;

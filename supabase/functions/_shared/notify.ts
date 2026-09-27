@@ -30,6 +30,7 @@ interface Order {
   state: string;
   pincode: string;
   preferred_delivery_date: string | null;
+  delivery_from: string | null;
   notes: string | null;
   gstin: string | null;
   language: string | null;
@@ -59,6 +60,13 @@ export const esc = (s: unknown) =>
 
 const formatDate = (d: string | null) =>
   d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+/** Expected delivery: "28 September 2026" or "28 – 29 September 2026" */
+const formatEta = (o: Order) => {
+  if (!o.preferred_delivery_date) return '—';
+  if (!o.delivery_from || o.delivery_from === o.preferred_delivery_date) return formatDate(o.preferred_delivery_date);
+  const from = new Date(`${o.delivery_from}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric' });
+  return `${from} – ${formatDate(o.preferred_delivery_date)}`;
+};
 
 const itemText = (i: OrderItem) => `${i.name}${i.variant ? ` · ${i.variant}` : ''} × ${i.qty}`;
 
@@ -83,7 +91,7 @@ const COPY = {
     paidOnline: 'Paid online ✓',
     cod: (amount: string) => `Pay ${amount} on delivery (cash or UPI)`,
     deliverTo: 'Delivering to',
-    preferred: 'Preferred delivery date',
+    preferred: 'Expected delivery',
     subtotal: 'Subtotal',
     delivery: 'Delivery',
     free: 'Free',
@@ -99,7 +107,7 @@ const COPY = {
     paidOnline: 'ಆನ್‌ಲೈನ್ ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ ✓',
     cod: (amount: string) => `ವಿತರಣೆಯ ಸಮಯದಲ್ಲಿ ${amount} ಪಾವತಿಸಿ (ನಗದು ಅಥವಾ UPI)`,
     deliverTo: 'ವಿತರಣಾ ವಿಳಾಸ',
-    preferred: 'ನಿಮಗೆ ಬೇಕಾದ ವಿತರಣಾ ದಿನಾಂಕ',
+    preferred: 'ನಿರೀಕ್ಷಿತ ವಿತರಣೆ',
     subtotal: 'ಉಪಮೊತ್ತ',
     delivery: 'ವಿತರಣಾ ಶುಲ್ಕ',
     free: 'ಉಚಿತ',
@@ -167,7 +175,7 @@ function customerEmail(o: Order, whatsappDisplay: string) {
     <table width="100%" style="margin-top:20px;font-size:14px;line-height:1.6;">
       <tr>
         <td valign="top" style="padding-right:12px;"><div style="color:#6b6250;font-size:12px;">${t.deliverTo}</div>${addressHtml(o)}</td>
-        <td valign="top"><div style="color:#6b6250;font-size:12px;">${t.preferred}</div>${esc(formatDate(o.preferred_delivery_date))}</td>
+        <td valign="top"><div style="color:#6b6250;font-size:12px;">${t.preferred}</div>${esc(formatEta(o))}</td>
       </tr>
     </table>
     <p style="margin:24px 0 0;font-size:13px;color:#6b6250;">${esc(t.questions)} ${esc(whatsappDisplay)}</p>
@@ -192,7 +200,7 @@ function adminEmail(o: Order, siteUrl: string) {
         ${o.gstin ? `<br>GSTIN: ${esc(o.gstin)}` : ''}
       </td></tr>
       <tr><td valign="top" style="padding-top:12px;"><div style="color:#6b6250;font-size:12px;">Deliver to</div>${addressHtml(o)}</td></tr>
-      <tr><td style="padding-top:12px;"><div style="color:#6b6250;font-size:12px;">Preferred delivery</div>${esc(formatDate(o.preferred_delivery_date))}</td></tr>
+      <tr><td style="padding-top:12px;"><div style="color:#6b6250;font-size:12px;">Expected delivery</div>${esc(formatEta(o))}</td></tr>
       ${o.notes ? `<tr><td style="padding-top:12px;"><div style="color:#6b6250;font-size:12px;">Customer note</div>${esc(o.notes)}</td></tr>` : ''}
       ${o.language === 'kn' ? `<tr><td style="padding-top:12px;color:#6b6250;font-size:12px;">Customer used the Kannada site</td></tr>` : ''}
     </table>
@@ -299,7 +307,7 @@ export async function notifyOrder(db: SupabaseClient, orderId: string) {
         o.phone,
         optEnv('WHATSAPP_TEMPLATE_CUSTOMER') || 'order_confirmation',
         kn ? optEnv('WHATSAPP_LANG_KN') || 'kn' : optEnv('WHATSAPP_LANG_EN') || 'en',
-        [o.customer_name, o.order_number, summary, inr(o.total), paymentText, formatDate(o.preferred_delivery_date)]
+        [o.customer_name, o.order_number, summary, inr(o.total), paymentText, formatEta(o)]
       )],
     // new_order_alert: New order {{1}} from {{2}} ({{3}}). Items: {{4}}. Total {{5}} – {{6}}. Deliver to {{7}}.
     ['whatsapp', 'admin', () =>

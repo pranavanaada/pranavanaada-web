@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { formatINR } from '../../lib/productUtils';
 import { inputClass } from './AdminProductForm';
-import { isSameDayOrder } from '../../lib/delivery';
+import { formatDeliveryRange, isSameDayOrder } from '../../lib/delivery';
 
 interface OrderItem {
   type: 'product' | 'combo';
@@ -31,6 +31,7 @@ interface Order {
   pincode: string;
   address_type: string | null;
   preferred_delivery_date: string | null;
+  delivery_from?: string | null;
   notes: string | null;
   gstin: string | null;
   language: string | null;
@@ -331,8 +332,7 @@ This was pay on delivery — it will also record ${formatINR(o.total)} as receiv
                           </div>
                           {o.preferred_delivery_date && (
                             <div className="mt-2">
-                              Preferred delivery:{' '}
-                              <b>{new Date(`${o.preferred_delivery_date}T00:00:00`).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</b>
+                              Expected delivery: <b>{formatDeliveryRange(o.delivery_from, o.preferred_delivery_date)}</b>
                             </div>
                           )}
                           {o.notes && <div className="mt-2 text-cream/70 whitespace-pre-line">Note: {o.notes}</div>}

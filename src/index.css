@@ -135,3 +135,13 @@ html[lang='kn'] h3 {
     margin-bottom: 1.25rem;
   }
 }
+
+/* Phones: iPhone Safari zooms in when a form field's text is under 16px, which leaves the page
+   zoomed and sliding sideways while typing an address. 16px fields keep it from zooming. */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

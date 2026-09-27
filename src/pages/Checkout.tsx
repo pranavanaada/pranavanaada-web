@@ -5,7 +5,7 @@ import { useLang } from '../i18n/useLang';
 import { useCart, itemLabel } from '../hooks/useCart';
 import { formatINR, sizeLabel } from '../lib/productUtils';
 import { WHATSAPP_WA_LINK } from '../config/contact';
-import { deliveryWindow } from '../lib/delivery';
+import { deliveryEstimate, formatDeliveryRange } from '../lib/delivery';
 import { describeItems } from '../hooks/useCart';
 import {
   CheckoutError,
@@ -39,18 +39,17 @@ const EMPTY: CheckoutCustomer = {
   state: 'Karnataka',
   pincode: '',
   addressType: 'home',
-  deliveryDate: '',
   notes: '',
   gstin: '',
 };
 
-type Field = 'name' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'pincode' | 'gstin' | 'deliveryDate';
+type Field = 'name' | 'email' | 'phone' | 'address' | 'city' | 'state' | 'pincode' | 'gstin';
 
 const inputBase =
   'w-full bg-emerald-950 border rounded-md px-3 py-2.5 text-sm outline-none transition-colors focus:border-neela-light focus:ring-2 focus:ring-neela/40';
 
 /** Same rules as the create-order function, so most mistakes are caught before sending. */
-function validate(c: CheckoutCustomer, earliest: string): Field[] {
+function validate(c: CheckoutCustomer): Field[] {
   const bad: Field[] = [];
   if (c.name.trim().length < 2) bad.push('name');
   if (!/^\S+@\S+\.\S+$/.test(c.email.trim())) bad.push('email');
@@ -60,7 +59,6 @@ function validate(c: CheckoutCustomer, earliest: string): Field[] {
   if (!c.state) bad.push('state');
   if (!/^[1-9]\d{5}$/.test(c.pincode.trim())) bad.push('pincode');
   if (c.gstin.trim() && !/^[0-9A-Z]{15}$/i.test(c.gstin.trim())) bad.push('gstin');
-  if (!c.deliveryDate || c.deliveryDate < earliest) bad.push('deliveryDate');
   return bad;
 }
 
@@ -87,18 +85,9 @@ export default function Checkout() {
     fetchStoreSettings().then(setSettings);
   }, []);
 
-  // Bengaluru: same-day before 6 pm (else tomorrow); elsewhere the store's minimum days ahead
-  const delivery = deliveryWindow(customer.city, customer.pincode, settings.min_delivery_days);
-  const earliest = delivery.earliest;
-
-  // Bengaluru fills in the earliest date (today before 6 pm); a date that's too early for the address is cleared
-  useEffect(() => {
-    setCustomer((c) => {
-      if (delivery.bengaluru && (!c.deliveryDate || c.deliveryDate < earliest)) return { ...c, deliveryDate: earliest };
-      if (!delivery.bengaluru && c.deliveryDate && c.deliveryDate < earliest) return { ...c, deliveryDate: '' };
-      return c;
-    });
-  }, [delivery.bengaluru, earliest]);
+  // Expected delivery from the address (the server works out the same and saves it with the order)
+  const eta = deliveryEstimate(customer.state, customer.city, customer.pincode);
+  const etaDates = eta ? formatDeliveryRange(eta.from, eta.to) : '';
   const subtotal = cart.total;
   const shipping = shippingFor(subtotal, settings);
   const total = subtotal + shipping;
@@ -124,7 +113,6 @@ export default function Checkout() {
     state: t('errState'),
     pincode: t('errPincode'),
     gstin: t('errGstin'),
-    deliveryDate: t('errDeliveryDate', { date: new Date(`${earliest}T00:00:00`).toLocaleDateString('en-IN', { dateStyle: 'medium' }) }),
   };
   const FieldError = ({ f }: { f: Field }) =>
     errors.includes(f) ? <p className="text-xs text-red-400 mt-1">{errorText[f]}</p> : null;
@@ -185,7 +173,7 @@ export default function Checkout() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
-    const bad = validate(customer, earliest);
+    const bad = validate(customer);
     setErrors(bad);
     if (bad.length) {
       setMessage(t('coFixFields'));
@@ -203,7 +191,8 @@ export default function Checkout() {
       }
       const res = await createOrder({
         items: toOrderLines(cart.items),
-        customer: { ...customer, language: lang },
+        // deliveryBy: the date shown to the customer, so an order sent just after 12 pm keeps "today"
+        customer: { ...customer, language: lang, deliveryBy: eta?.to ?? '' },
         paymentMethod: method,
       });
       if (res.order) return finish(res.order); // Pay on delivery
@@ -351,28 +340,25 @@ export default function Checkout() {
           <section className={cardClass}>
             <StepTitle n={3}>{t('coDelivery')}</StepTitle>
             <div className="space-y-4">
-              <div className="max-w-xs" data-first-error={firstError === 'deliveryDate' || undefined}>
-                <label className={label}>{t('coDeliveryDate')}</label>
-                <input
-                  type="date"
-                  min={earliest}
-                  value={customer.deliveryDate}
-                  onChange={set('deliveryDate')}
-                  className={`${fieldClass('deliveryDate')} [color-scheme:dark]`}
-                />
-                <FieldError f="deliveryDate" />
+              <div
+                className={`rounded-lg px-4 py-3 border ${
+                  eta?.sameDay ? 'border-gold/50 bg-gold/10' : 'border-emerald-700 bg-emerald-950/40'
+                }`}
+              >
+                <div className="text-xs text-cream/55">🚚 {t('coExpected')}</div>
+                {eta ? (
+                  <>
+                    <div className={`text-base font-semibold mt-0.5 ${eta.sameDay ? 'text-gold-light' : 'text-cream'}`}>
+                      {eta.zone === 'bengaluru'
+                        ? t(eta.sameDay ? 'coEtaToday' : 'coEtaTomorrow', { date: etaDates })
+                        : t(eta.zone === 'karnataka' ? 'coEtaKarnataka' : 'coEtaIndia', { dates: etaDates })}
+                    </div>
+                    <div className="text-[11px] text-cream/45 mt-1">{t(`coEtaNote_${eta.zone}`)}</div>
+                  </>
+                ) : (
+                  <div className="text-xs text-cream/60 mt-1">{t('coEtaRules')}</div>
+                )}
               </div>
-              {delivery.bengaluru ? (
-                <p
-                  className={`text-sm rounded-lg px-3 py-2.5 border ${
-                    delivery.sameDay ? 'border-gold/50 bg-gold/10 text-gold-light' : 'border-emerald-700 bg-emerald-950/40 text-cream/70'
-                  }`}
-                >
-                  🚚 {delivery.sameDay ? t('coSameDay') : t('coSameDayLate')}
-                </p>
-              ) : (
-                <p className="text-xs text-cream/45">{t('coDeliveryHint', { days: settings.min_delivery_days })}</p>
-              )}
               <div>
                 <label className={label}>{t('coNotes')}</label>
                 <textarea rows={2} value={customer.notes} onChange={set('notes')} className={`${inputBase} border-emerald-700 resize-y`} />

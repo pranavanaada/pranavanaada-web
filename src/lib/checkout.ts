@@ -31,7 +31,6 @@ export interface CheckoutCustomer {
   state: string;
   pincode: string;
   addressType: string;
-  deliveryDate: string;
   notes: string;
   gstin: string;
 }
@@ -50,6 +49,8 @@ export interface PlacedOrder {
   city: string;
   state: string;
   pincode: string;
+  /** Expected delivery window (set by the server from the address) */
+  delivery_from?: string | null;
   preferred_delivery_date?: string | null;
   items: {
     type: 'product' | 'combo';
@@ -145,7 +146,8 @@ async function callFunction<T>(name: string, body: Record<string, unknown>): Pro
 
 export function createOrder(payload: {
   items: ReturnType<typeof toOrderLines>;
-  customer: CheckoutCustomer & { language: string };
+  /** deliveryBy: the expected date shown to the customer (the server keeps it if still valid) */
+  customer: CheckoutCustomer & { language: string; deliveryBy: string };
   paymentMethod: PaymentMethod;
 }) {
   return callFunction<{
@@ -245,8 +247,8 @@ export function loadSavedDetails(): Partial<CheckoutCustomer> {
 
 export function saveDetails(c: CheckoutCustomer) {
   try {
-    // Delivery date and notes are per-order, so they aren't remembered.
-    const { deliveryDate: _d, notes: _n, ...keep } = c;
+    // Notes are per-order, so they aren't remembered.
+    const { notes: _n, ...keep } = c;
     localStorage.setItem(DETAILS_KEY, JSON.stringify(keep));
   } catch {
     // ignore

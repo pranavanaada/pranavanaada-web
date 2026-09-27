@@ -3,7 +3,7 @@
 // order, and for "Pay Now" creates the matching Razorpay order.
 import { adminClient, corsHeaders, env, json, PUBLIC_ORDER_FIELDS } from '../_shared/common.ts';
 import { notifyInBackground } from '../_shared/notify.ts';
-import { earliestDelivery } from '../_shared/delivery.ts';
+import { deliveryEstimate, GRACE_MS } from '../_shared/delivery.ts';
 
 type CartLine =
   | { type: 'product'; product_id: string; variant?: string; qty: number }
@@ -21,7 +21,7 @@ const MAX_QTY = 99;
 
 const clean = (v: unknown, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
-function validateCustomer(c: Record<string, unknown>, minDays: number) {
+function validateCustomer(c: Record<string, unknown>) {
   const out = {
     customer_name: clean(c.name, 100),
     email: clean(c.email, 150).toLowerCase(),
@@ -34,7 +34,6 @@ function validateCustomer(c: Record<string, unknown>, minDays: number) {
     state: clean(c.state, 80),
     pincode: clean(c.pincode, 10),
     address_type: clean(c.addressType, 20) || null,
-    preferred_delivery_date: clean(c.deliveryDate, 10) || null,
     notes: clean(c.notes, 1000) || null,
     gstin: clean(c.gstin, 20).toUpperCase() || null,
     language: clean(c.language, 5) || 'en',
@@ -48,14 +47,12 @@ function validateCustomer(c: Record<string, unknown>, minDays: number) {
   if (!out.state) errors.push('state');
   if (!/^[1-9]\d{5}$/.test(out.pincode)) errors.push('pincode');
   if (out.gstin && !/^[0-9A-Z]{15}$/.test(out.gstin)) errors.push('gstin');
-  if (out.preferred_delivery_date) {
-    // Bengaluru: same day before 6 pm (India time), else tomorrow; elsewhere minDays ahead
-    const valid = /^\d{4}-\d{2}-\d{2}$/.test(out.preferred_delivery_date);
-    if (!valid || out.preferred_delivery_date < earliestDelivery(out.city, out.pincode, minDays)) errors.push('deliveryDate');
-  } else {
-    errors.push('deliveryDate');
-  }
-  return { customer: out, errors };
+  // Expected delivery from the address — Bengaluru same day before 12 pm, Karnataka 1–2 days, elsewhere 3–4
+  // Keep the date the customer was shown if it was right a few minutes ago (e.g. "today" seen at 11:59)
+  const now = deliveryEstimate(out.state, out.city, out.pincode);
+  const earlier = deliveryEstimate(out.state, out.city, out.pincode, Date.now() - GRACE_MS);
+  const eta = clean(c.deliveryBy, 10) === earlier.to ? earlier : now;
+  return { customer: { ...out, delivery_from: eta.from, preferred_delivery_date: eta.to }, errors };
 }
 
 Deno.serve(async (req) => {
@@ -79,7 +76,7 @@ Deno.serve(async (req) => {
       min_delivery_days: 7,
     };
 
-    const { customer, errors } = validateCustomer(body.customer ?? {}, Number(s.min_delivery_days) || 0);
+    const { customer, errors } = validateCustomer(body.customer ?? {});
     if (errors.length) return json({ error: 'invalid_details', fields: errors }, 400);
 
     // ---- Price every line from the database --------------------------------
