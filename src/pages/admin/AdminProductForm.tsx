@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { invalidateCatalog } from '../../hooks/useProducts';
 import type { Product, ProductCategory, ProductVariant } from '../../types/product';
 import ImageManager, { type ManagedImage } from './ImageManager';
+import { MAX_VIDEO_MB, uploadProductVideo } from '../../lib/imageUpload';
 
 export const inputClass =
   'w-full bg-emerald-950 border border-emerald-700 rounded-md px-3 py-2.5 text-sm outline-none focus:border-gold';
@@ -70,6 +71,8 @@ export default function AdminProductForm() {
   const [badgeKn, setBadgeKn] = useState('');
   const [variants, setVariants] = useState<VariantRow[]>([]);
   const [images, setImages] = useState<ManagedImage[]>([]);
+  const [video, setVideo] = useState<string | null>(null);
+  const [videoBusy, setVideoBusy] = useState(false);
   const [inStock, setInStock] = useState(true);
   const [visible, setVisible] = useState(true);
   const [featured, setFeatured] = useState(false);
@@ -106,6 +109,7 @@ export default function AdminProductForm() {
             inStock: v.in_stock !== false,
           }))
         );
+        setVideo(p.video ?? null);
         setImages([
           ...(p.image ? [{ url: p.image, thumb: p.thumb }] : []),
           ...(p.images || []).map((url) => ({ url })),
@@ -162,6 +166,7 @@ export default function AdminProductForm() {
       variants: cleanVariants,
       image: main.url,
       thumb: main.thumb || null,
+      video,
       images: extras.map((i) => i.url),
       in_stock: inStock,
       is_visible: visible,
@@ -237,6 +242,41 @@ export default function AdminProductForm() {
 
         <Section title="Photos">
           <ImageManager images={images} onChange={setImages} />
+          <div className="border-t border-emerald-800 pt-4">
+            <div className="text-xs text-cream/50 mb-2">Product video (optional — shown as the last item in the gallery)</div>
+            {video ? (
+              <div className="flex items-start gap-4">
+                <video src={video} muted loop autoPlay playsInline className="w-32 h-32 object-cover rounded-lg border border-emerald-700" />
+                <button type="button" onClick={() => setVideo(null)} className="text-xs text-red-300 hover:underline">
+                  Remove video
+                </button>
+              </div>
+            ) : (
+              <label className="inline-block cursor-pointer text-xs text-gold hover:underline">
+                {videoBusy ? 'Uploading video…' : '+ Upload a short video (MP4, under ' + MAX_VIDEO_MB + ' MB)'}
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  hidden
+                  disabled={videoBusy}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = '';
+                    if (!file) return;
+                    setVideoBusy(true);
+                    setError(null);
+                    try {
+                      setVideo(await uploadProductVideo(file));
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : 'Video upload failed');
+                    } finally {
+                      setVideoBusy(false);
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </div>
         </Section>
 
         <Section title="Price & weights">

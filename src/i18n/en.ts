@@ -17,6 +17,12 @@ const en = {
   heroTitle: 'Pranavanaada',
   heroSubtitle:
     'Experience the divine resonance of authentic handcrafted bells, blessed with centuries of tradition and spiritual significance.',
+  heroShowcase: 'Our bells',
+  heroBellAnjaneya: 'Anjaneya Hand Bell',
+  heroBellPranava: 'Pranava Hand Bell',
+  heroBellHanging: 'Hanging Bell',
+  heroBellGola: 'Brahmanda Gola Hand Bell',
+  heroBellJayagante: 'Jayagante',
   featHandcrafted: 'Handcrafted',
   featPanchaloha: 'Panchaloha Metal',
   featCasting: 'Traditional Casting',
@@ -173,6 +179,7 @@ const en = {
   inList: 'In List',
   zoomProduct: 'Zoom {{name}}',
   tapToZoom: 'Tap to zoom',
+  productVideo: 'Video of {{name}}',
   backToShop: '← Back to Shop',
   productNotFound: 'Product not found.',
   photoOf: 'Photo {{n}} of {{total}}',
@@ -247,6 +254,7 @@ const en = {
   // About (from the original site)
   invocation: '|| Sri Ranga Maha Guruve Namaha ||',
   aboutTitle: 'About Pranavanaada',
+  aboutPhotoAlt: 'Anjaneya, Chakra and Nandi Panchaloha hand bells',
   namasteTitle: 'Namaste',
   namasteText:
     'This bell, a sacred instrument, is made of five metals. When it is rung, its fundamental sound naturally resonates as a sacred instrument — Om Om Om. Its echo repeats Om Om Om many times and finally dissolves into Om, giving it an extraordinary quality.',

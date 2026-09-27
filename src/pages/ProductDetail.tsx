@@ -71,6 +71,8 @@ export default function ProductDetail() {
   const variant = variants[Math.min(selected, variants.length - 1)];
   const available = isVariantAvailable(product, multi ? variant : undefined);
   const gallery = getGallery(product);
+  // The video (if any) sits after the photos: index === gallery.length.
+  const showVideo = !!product.video && photo === gallery.length;
   const currentPhoto = gallery[Math.min(photo, gallery.length - 1)];
   // Everything of this product in the list, across all weights
   const inList = cart.items.filter((i) => i.id === product.id);
@@ -86,38 +88,77 @@ export default function ProductDetail() {
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={currentPhoto}
+            key={showVideo ? 'video' : currentPhoto}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <MagnifyImage
-              src={currentPhoto}
-              placeholder={currentPhoto === product.image ? product.thumb ?? undefined : undefined}
-              alt={name}
-              badge={productBadge(product, lang)}
-              onOpen={() => setZoomOpen(true)}
-            />
+            {showVideo && product.video ? (
+              // Only downloaded once the visitor picks the video thumbnail.
+              <video
+                src={product.video}
+                poster={product.image}
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+                preload="auto"
+                className="block w-full aspect-square object-cover rounded-xl border border-emerald-800 bg-emerald-950"
+                aria-label={t('productVideo', { name })}
+              />
+            ) : (
+              <MagnifyImage
+                src={currentPhoto}
+                placeholder={currentPhoto === product.image ? product.thumb ?? undefined : undefined}
+                alt={name}
+                badge={productBadge(product, lang)}
+                onOpen={() => setZoomOpen(true)}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 
-        {gallery.length > 1 && (
-          <div className="flex gap-3 mt-3">
-            {gallery.map((src, i) => (
+        {(gallery.length > 1 || product.video) && (
+          <div className="flex flex-wrap gap-3 mt-3">
+            {gallery.map((src, i) => {
+              const active = !showVideo && src === currentPhoto;
+              return (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setPhoto(i)}
+                  aria-label={t('photoOf', { n: i + 1, total: gallery.length })}
+                  aria-current={active}
+                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    active ? 'border-gold' : 'border-emerald-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={i === 0 && product.thumb ? product.thumb : src} alt="" className="w-full h-full object-cover" />
+                </button>
+              );
+            })}
+            {product.video && (
               <button
-                key={src}
                 type="button"
-                onClick={() => setPhoto(i)}
-                aria-label={t('photoOf', { n: i + 1, total: gallery.length })}
-                aria-current={src === currentPhoto}
-                className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                  src === currentPhoto ? 'border-gold' : 'border-emerald-800 opacity-60 hover:opacity-100'
+                onClick={() => setPhoto(gallery.length)}
+                aria-label={t('productVideo', { name })}
+                aria-current={showVideo}
+                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                  showVideo ? 'border-gold' : 'border-emerald-800 opacity-70 hover:opacity-100'
                 }`}
               >
-                <img src={i === 0 && product.thumb ? product.thumb : src} alt="" className="w-full h-full object-cover" />
+                <img src={product.thumb || product.image} alt="" className="w-full h-full object-cover brightness-75" />
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-8 h-8 rounded-full bg-emerald-950/80 border border-gold text-gold flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 translate-x-[1px]" fill="currentColor" aria-hidden>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </span>
               </button>
-            ))}
+            )}
           </div>
         )}
       </motion.div>

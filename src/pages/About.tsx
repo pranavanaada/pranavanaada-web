@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Reveal, fadeUp, stagger } from '../components/motion';
 import { useLang } from '../i18n/useLang';
+import threeBells from '../assets/about/three-bells.webp';
 
 const METALS = ['metalGold', 'metalSilver', 'metalCopper', 'metalBrass', 'metalTin'];
 
@@ -15,6 +16,13 @@ export default function About() {
       </Reveal>
 
       <Reveal className="mb-10">
+        {/* Anjaneya, Chakra and Nandi hand bells together */}
+        <img
+          src={threeBells}
+          alt={t('aboutPhotoAlt')}
+          loading="lazy"
+          className="w-full max-w-[260px] mx-auto mb-8 md:float-right md:ml-8 md:mb-4 md:w-[240px] rounded-2xl border border-gold/30 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]"
+        />
         <h2 className="font-heading text-cream text-2xl mb-3">{t('namasteTitle')}</h2>
         <p className="text-cream/70 leading-relaxed">{t('namasteText')}</p>
       </Reveal>

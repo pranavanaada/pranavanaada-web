@@ -28,7 +28,15 @@ export async function compressImage(file: Blob, maxWidth: number, quality = 0.82
   return jpeg;
 }
 
-const extFor = (blob: Blob) => (blob.type === 'image/webp' ? 'webp' : blob.type === 'image/png' ? 'png' : 'jpg');
+const EXT: Record<string, string> = {
+  'image/webp': 'webp',
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
+  'video/quicktime': 'mov',
+};
+const extFor = (blob: Blob) => EXT[blob.type] ?? 'jpg';
 
 async function uploadBlob(blob: Blob, folder: string, baseName: string) {
   const safe = baseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'image';
@@ -64,4 +72,14 @@ export async function uploadAsIs(src: string, name: string, folder = 'products')
     return r.blob();
   });
   return uploadBlob(blob, folder, name);
+}
+
+export const MAX_VIDEO_MB = 15;
+
+/** Upload a product video as-is (compress it first — short, muted, ~720p keeps pages fast). */
+export async function uploadProductVideo(file: File) {
+  if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+    throw new Error(`Video is ${(file.size / 1024 / 1024).toFixed(1)} MB — please keep it under ${MAX_VIDEO_MB} MB.`);
+  }
+  return uploadBlob(file, 'videos', file.name.replace(/\.[^.]+$/, ''));
 }

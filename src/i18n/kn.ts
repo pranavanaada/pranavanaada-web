@@ -21,6 +21,12 @@ const kn: Record<keyof typeof en, string> = {
   heroTitle: 'ಪ್ರಣವನಾದ',
   heroSubtitle:
     'ಶತಮಾನಗಳ ಸಂಪ್ರದಾಯ ಮತ್ತು ಆಧ್ಯಾತ್ಮಿಕ ಮಹತ್ವದಿಂದ ಆಶೀರ್ವದಿಸಲ್ಪಟ್ಟ ಅಧಿಕೃತ ಕರಕುಶಲ ಘಂಟೆಗಳ ದಿವ್ಯ ಪ್ರತಿಧ್ವನಿಯನ್ನು ಅನುಭವಿಸಿ.',
+  heroShowcase: 'ನಮ್ಮ ಘಂಟೆಗಳು',
+  heroBellAnjaneya: 'ಆಂಜನೇಯ ಕೈ ಘಂಟೆ',
+  heroBellPranava: 'ಪ್ರಣವ ಕೈ ಘಂಟೆ',
+  heroBellHanging: 'ನೇತಾಡುವ ಘಂಟೆ',
+  heroBellGola: 'ಬ್ರಹ್ಮಾಂಡ ಗೋಲ ಕೈ ಘಂಟೆ',
+  heroBellJayagante: 'ಜಯಘಂಟೆ',
   featHandcrafted: 'ಕರಕುಶಲ',
   featPanchaloha: 'ಪಂಚಲೋಹ',
   featCasting: 'ಸಾಂಪ್ರದಾಯಿಕ ಎರಕ',
@@ -177,6 +183,7 @@ const kn: Record<keyof typeof en, string> = {
   inList: 'ಪಟ್ಟಿಯಲ್ಲಿದೆ',
   zoomProduct: '{{name}} ದೊಡ್ಡದಾಗಿ ನೋಡಿ',
   tapToZoom: 'ದೊಡ್ಡದಾಗಿ ನೋಡಲು ಒತ್ತಿ',
+  productVideo: '{{name}} ವಿಡಿಯೋ',
   backToShop: '← ಉತ್ಪನ್ನಗಳಿಗೆ ಹಿಂತಿರುಗಿ',
   productNotFound: 'ಉತ್ಪನ್ನ ಕಂಡುಬಂದಿಲ್ಲ.',
   photoOf: 'ಚಿತ್ರ {{n}} / {{total}}',
@@ -250,6 +257,7 @@ const kn: Record<keyof typeof en, string> = {
   // About (old site)
   invocation: '|| ಶ್ರೀ ರಂಗ ಮಹಾ ಗುರುವೇ ನಮಃ ||',
   aboutTitle: 'ನಮ್ಮ ಬಗ್ಗೆ',
+  aboutPhotoAlt: 'ಆಂಜನೇಯ, ಚಕ್ರ ಮತ್ತು ನಂದಿ ಪಂಚಲೋಹ ಕೈ ಘಂಟೆಗಳು',
   namasteTitle: 'ನಮಸ್ತೆ',
   namasteText:
     'ಪವಿತ್ರ ವಾದ್ಯವಾಗಿರುವ ಈ ಘಂಟೆಯು ಐದು ಲೋಹಗಳಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದೆ. ಈ ಘಂಟೆಯನ್ನು ಬಾರಿಸಿದಾಗ, ಅದರ ಮೂಲ ಧ್ವನಿಯು ಸ್ವಾಭಾವಿಕವಾಗಿ ಪವಿತ್ರ ವಾದ್ಯವಾಗಿ ಪ್ರತಿಧ್ವನಿಸುತ್ತದೆ - ಓಂ ಓಂ ಓಂ. ಇದರ ಪ್ರತಿಧ್ವನಿಯು ಓಂ ಓಂ ಓಂ ಎಂದು ಹಲವಾರು ಬಾರಿ ಪುನರಾವರ್ತನೆಯಾಗುತ್ತದೆ ಮತ್ತು ಅಂತಿಮವಾಗಿ ಓಂನೊಂದಿಗೆ ಕೊನೆಗೊಳ್ಳುತ್ತದೆ, ಇದು ಅಸಾಧಾರಣ ಗುಣಮಟ್ಟವನ್ನು ನೀಡುತ್ತದೆ.',

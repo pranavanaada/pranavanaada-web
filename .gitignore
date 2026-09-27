@@ -12,3 +12,6 @@ dist
 supabase/.temp
 supabase/.branches
 *.log
+
+# Compressed media produced by scripts/upload-media.mjs
+.media-cache

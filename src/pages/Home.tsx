@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard';
 import InquiryModal from '../components/InquiryModal';
 import { WhyChoose, JourneyCta } from '../components/HomeSections';
 import RingTheBell from '../components/RingTheBell';
+import HeroBells from '../components/HeroBells';
 import CombosSection from '../components/CombosSection';
 // Below the fold, and carries all review text + avatars — loaded as its own
 // chunk so it doesn't slow the first paint of the home page.
@@ -16,9 +17,6 @@ import { Reveal, fadeUp, stagger } from '../components/motion';
 import { prefetchRoute } from './lazy';
 import type { Product, ProductVariant } from '../types/product';
 import { nameWithVariant } from '../lib/productUtils';
-// Anjaneya hand bell studio shot on green felt — the felt colour matches the
-// hero background (#013b2c) so the photo blends in without visible edges.
-import heroLeft from '../assets/products/hand-bell-1.webp';
 
 const iconProps = {
   viewBox: '0 0 24 24',
@@ -135,42 +133,40 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero — photo backdrop with bells framing the centred title */}
-      <section ref={heroRef} className="relative overflow-hidden bg-[#013b2c] min-h-[520px] md:min-h-[600px] flex items-center">
-        {/* Bells fade in from the edges; slow zoom gives the photo some life */}
-        <motion.img
-          src={heroLeft}
-          alt=""
-          aria-hidden
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="hero-edge-left absolute left-0 lg:left-[4%] bottom-0 h-[92%] w-auto max-w-none pointer-events-none"
-        />
-        {/* Dark overlay + warm glow so text stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-emerald-950/80" aria-hidden />
-        {/* Spotlight behind the title, like a shrine lamp */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.35)_0%,transparent_60%)]" aria-hidden />
+      {/* Hero — title and bell button on one side, floating bell showcase on the other */}
+      <section ref={heroRef} className="relative overflow-hidden bg-[#013b2c]">
+        {/* Soft vignette + warm glow behind the bells */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/5 to-emerald-950/80" aria-hidden />
         <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] max-w-[150vw] bg-gold/10 rounded-full blur-3xl pointer-events-none"
+          className="absolute right-[-10%] lg:right-[5%] top-1/2 -translate-y-1/2 w-[640px] h-[640px] max-w-[150vw] bg-gold/10 rounded-full blur-3xl pointer-events-none"
           animate={{ scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden
         />
+
+        <div className="relative max-w-6xl mx-auto px-5 pt-10 pb-14 lg:py-16 grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-10 items-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:order-2"
+        >
+          <HeroBells />
+        </motion.div>
 
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
           variants={stagger(0.12, 0.2)}
           initial="hidden"
           animate="show"
-          className="relative w-full max-w-4xl mx-auto px-5 py-20 text-center"
+          className="relative w-full text-center lg:order-1"
         >
           <motion.div variants={fadeUp} className="text-xs uppercase tracking-[0.25em] text-gold-light mb-5">
             {t('heroEyebrow')}
           </motion.div>
           <motion.h1
             variants={fadeUp}
-            className="font-heading text-5xl md:text-7xl font-semibold tracking-wide leading-tight mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
+            className="font-heading text-5xl md:text-7xl lg:text-6xl font-semibold tracking-wide leading-tight mb-5 text-cream drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
           >
             {t('heroTitle')}
           </motion.h1>
@@ -199,6 +195,7 @@ export default function Home() {
             ))}
           </motion.ul>
         </motion.div>
+        </div>
       </section>
 
       {/* Category chips — jump straight into a filtered Shop */}

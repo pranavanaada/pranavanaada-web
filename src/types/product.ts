@@ -21,6 +21,8 @@ export interface Product {
   thumb?: string | null;
   /** Extra photos shown in the product page gallery (after `image`). */
   images?: string[];
+  /** Short muted video clip, shown as the last item in the product page gallery. */
+  video?: string | null;
   /** Weight/size options. Empty or missing = single price (`price`). */
   variants?: ProductVariant[];
   /** Short label shown on the product photo, e.g. "Stick included". */

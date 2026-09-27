@@ -45,6 +45,7 @@ create table if not exists products (
   in_stock boolean not null default true,
   featured boolean not null default false, -- shown on the home page
   sort_order integer not null default 0,   -- lower numbers first
+  video text,                              -- short muted clip shown in the product gallery
   is_visible boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -60,6 +61,7 @@ alter table products add column if not exists badge_kn text;
 alter table products add column if not exists in_stock boolean not null default true;
 alter table products add column if not exists featured boolean not null default false;
 alter table products add column if not exists sort_order integer not null default 0;
+alter table products add column if not exists video text;          -- short muted clip shown in the product gallery
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Combo offers — a bundle of products at a special price
