@@ -4,7 +4,8 @@
  * then upload the photos and attach them to the product.
  *
  *   npm run make-spin -- --product "Anjaneya Hand Bell" front.jpg left.jpg back.jpg right.jpg
- *   (add --dry-run to only make the lined-up photos in .media-cache/spin/<product>/)
+ *   (add --dry-run to only make the lined-up photos in .media-cache/spin/<product>/,
+ *    --keep-background to keep the original cloth instead of the felt)
  *
  * Photos: same green cloth, bell standing upright, in turning order
  * (front → one side → back → other side; more angles in between make it smoother).
@@ -19,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import sharp from 'sharp';
+import { placeOnFelt } from './spin-felt.mjs';
 
 sharp.cache(false);
 const PROJECT_REF = 'qgmjfcioczdxglhwxwoi';
@@ -35,6 +37,8 @@ const flag = (name) => {
   return v;
 };
 const dryRun = args.includes('--dry-run') && args.splice(args.indexOf('--dry-run'), 1);
+// By default the bell is moved onto the same deep-green felt as the edited photos
+const keepBackground = args.includes('--keep-background') && args.splice(args.indexOf('--keep-background'), 1);
 const productName = flag('product');
 const photos = args;
 if (!productName || photos.length < 2) {
@@ -98,18 +102,25 @@ OW = Math.floor(OW);
 OH = Math.floor(OH);
 const BOT = OH - below;
 
-const files = [];
-for (const [i, m] of scaled.entries()) {
+const lined = [];
+for (const m of scaled) {
   const rw = Math.round(m.W), rh = Math.round((m.H / m.W) * rw); // size after resize (sharp keeps the aspect ratio)
   const clamp = (v, max) => Math.min(Math.max(0, v), max);
   const left = clamp(Math.round(m.cx - OW / 2), rw - OW);
   const top = clamp(Math.round(m.bottom - BOT), rh - OH);
-  const out = path.join(outDir, `${slug}-${i + 1}.webp`);
   // Two passes: sharp allows only one resize per pipeline
-  const lined = await sharp(m.file).rotate().resize(rw).extract({ left, top, width: OW, height: OH }).toBuffer();
-  await sharp(lined).resize({ width: Math.min(OUT_WIDTH, OW) }).webp({ quality: 82 }).toFile(out);
+  const img = await sharp(m.file).rotate().resize(rw).extract({ left, top, width: OW, height: OH }).removeAlpha().raw().toBuffer();
+  lined.push({ data: img, width: OW, height: OH });
+  console.log(`${path.basename(m.file)}: lined up (×${m.s.toFixed(2)})`);
+}
+
+const finished = keepBackground ? lined.map((f) => f.data) : await placeOnFelt(lined);
+const files = [];
+for (const [i, data] of finished.entries()) {
+  const out = path.join(outDir, `${slug}-${i + 1}.webp`);
+  await sharp(data, { raw: { width: OW, height: OH, channels: 3 } }).resize({ width: Math.min(OUT_WIDTH, OW) }).webp({ quality: 82 }).toFile(out);
   files.push(out);
-  console.log(`${path.basename(m.file)} → ${out}  (×${m.s.toFixed(2)})`);
+  console.log(`→ ${out}`);
 }
 
 if (dryRun) {
