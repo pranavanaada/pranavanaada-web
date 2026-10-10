@@ -13,6 +13,7 @@ export const loaders = {
   checkout: () => import('./Checkout'),
   orderConfirmed: () => import('./OrderConfirmed'),
   policy: () => import('./Policy'),
+  orderPage: () => import('./OrderPage'),
   adminRoot: () => import('./admin/AdminRoot'),
   protectedRoute: () => import('../components/ProtectedRoute'),
   adminLogin: () => import('./admin/AdminLogin'),
@@ -24,6 +25,7 @@ export const loaders = {
   adminComboForm: () => import('./admin/AdminComboForm'),
   adminSettings: () => import('./admin/AdminSettings'),
   adminOrders: () => import('./admin/AdminOrders'),
+  adminReturns: () => import('./admin/AdminReturns'),
   adminResetPassword: () => import('./admin/AdminResetPassword'),
 };
 
@@ -36,6 +38,7 @@ export const Contact = lazy(loaders.contact);
 export const Checkout = lazy(loaders.checkout);
 export const OrderConfirmed = lazy(loaders.orderConfirmed);
 export const Policy = lazy(loaders.policy);
+export const OrderPage = lazy(loaders.orderPage);
 export const AdminRoot = lazy(loaders.adminRoot);
 export const ProtectedRoute = lazy(loaders.protectedRoute);
 export const AdminLogin = lazy(loaders.adminLogin);
@@ -47,6 +50,7 @@ export const AdminCombos = lazy(loaders.adminCombos);
 export const AdminComboForm = lazy(loaders.adminComboForm);
 export const AdminSettings = lazy(loaders.adminSettings);
 export const AdminOrders = lazy(loaders.adminOrders);
+export const AdminReturns = lazy(loaders.adminReturns);
 export const AdminResetPassword = lazy(loaders.adminResetPassword);
 
 const routePrefetch: Record<string, () => Promise<unknown>> = {

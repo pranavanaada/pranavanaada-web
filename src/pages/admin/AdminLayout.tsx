@@ -9,6 +9,7 @@ export default function AdminLayout() {
   const { pathname } = useLocation();
   const [newCount, setNewCount] = useState(0);
   const [newOrders, setNewOrders] = useState(0);
+  const [openReturns, setOpenReturns] = useState(0);
 
   // Unread enquiries badge — refreshed when moving between admin pages.
   useEffect(() => {
@@ -22,6 +23,12 @@ export default function AdminLayout() {
       .select('id', { count: 'exact', head: true })
       .eq('status', 'placed')
       .then(({ count }) => setNewOrders(count ?? 0));
+    // Return requests waiting for a decision or for the item to be checked
+    supabase
+      .from('return_requests')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['requested', 'received'])
+      .then(({ count }) => setOpenReturns(count ?? 0));
   }, [pathname]);
 
   async function handleSignOut() {
@@ -47,6 +54,14 @@ export default function AdminLayout() {
             {newOrders > 0 && (
               <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-400 text-emerald-950 text-[11px] font-bold flex items-center justify-center">
                 {newOrders}
+              </span>
+            )}
+          </NavLink>
+          <NavLink to="/admin/returns" className={linkClass}>
+            Returns
+            {openReturns > 0 && (
+              <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-400 text-emerald-950 text-[11px] font-bold flex items-center justify-center">
+                {openReturns}
               </span>
             )}
           </NavLink>

@@ -49,6 +49,8 @@ export interface PlacedOrder {
   city: string;
   state: string;
   pincode: string;
+  /** Private link token for the customer's order page (/order/PN-…?t=…) */
+  access_token?: string;
   /** Expected delivery window (set by the server from the address) */
   delivery_from?: string | null;
   preferred_delivery_date?: string | null;

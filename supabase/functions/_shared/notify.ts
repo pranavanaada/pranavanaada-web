@@ -41,6 +41,7 @@ interface Order {
   payment_method: 'online' | 'cod';
   payment_status: string;
   created_at: string;
+  access_token: string | null;
 }
 
 interface Attempt {
@@ -85,7 +86,9 @@ const COPY = {
   en: {
     subject: (n: string) => `Your Pranavanaada order ${n} is confirmed`,
     greeting: (name: string) => `Namaste ${name},`,
-    intro: 'Thank you for your order. Each bell is made and tuned with care — we will call or WhatsApp you to confirm the delivery date.',
+    intro: 'Thank you for your order. Each bell is made and checked with care before it is packed.',
+    viewOrder: 'View your order',
+    manage: 'Follow your order on your order page — you can cancel it there until it is dispatched, and report a problem within 3 days of delivery (please record an unboxing video when you open the package).',
     orderNumber: 'Order number',
     payment: 'Payment',
     paidOnline: 'Paid online ✓',
@@ -101,7 +104,9 @@ const COPY = {
   kn: {
     subject: (n: string) => `ನಿಮ್ಮ ಪ್ರಣವನಾದ ಆರ್ಡರ್ ${n} ಖಚಿತವಾಗಿದೆ`,
     greeting: (name: string) => `ನಮಸ್ಕಾರ ${name},`,
-    intro: 'ನಿಮ್ಮ ಆರ್ಡರ್‌ಗೆ ಧನ್ಯವಾದಗಳು. ಪ್ರತಿ ಘಂಟೆಯನ್ನು ಶ್ರದ್ಧೆಯಿಂದ ತಯಾರಿಸಲಾಗುತ್ತದೆ — ವಿತರಣಾ ದಿನಾಂಕ ಖಚಿತಪಡಿಸಲು ನಾವು ನಿಮಗೆ ಕರೆ ಅಥವಾ WhatsApp ಮಾಡುತ್ತೇವೆ.',
+    intro: 'ನಿಮ್ಮ ಆರ್ಡರ್‌ಗೆ ಧನ್ಯವಾದಗಳು. ಪ್ರತಿ ಘಂಟೆಯನ್ನು ಶ್ರದ್ಧೆಯಿಂದ ತಯಾರಿಸಿ, ಪ್ಯಾಕ್ ಮಾಡುವ ಮೊದಲು ಪರಿಶೀಲಿಸಲಾಗುತ್ತದೆ.',
+    viewOrder: 'ನಿಮ್ಮ ಆರ್ಡರ್ ನೋಡಿ',
+    manage: 'ನಿಮ್ಮ ಆರ್ಡರ್ ಪುಟದಲ್ಲಿ ಆರ್ಡರ್ ಸ್ಥಿತಿ ನೋಡಿ — ರವಾನೆಯಾಗುವವರೆಗೆ ಅಲ್ಲೇ ರದ್ದುಮಾಡಬಹುದು, ವಿತರಣೆಯ 3 ದಿನಗಳೊಳಗೆ ಸಮಸ್ಯೆ ತಿಳಿಸಬಹುದು (ಪ್ಯಾಕೇಜ್ ತೆರೆಯುವಾಗ ಅನ್‌ಬಾಕ್ಸಿಂಗ್ ವಿಡಿಯೋ ಮಾಡಿ).',
     orderNumber: 'ಆರ್ಡರ್ ಸಂಖ್ಯೆ',
     payment: 'ಪಾವತಿ',
     paidOnline: 'ಆನ್‌ಲೈನ್ ಪಾವತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ ✓',
@@ -161,7 +166,11 @@ export function shell(inner: string) {
   </td></tr></table></body></html>`;
 }
 
-function customerEmail(o: Order, whatsappDisplay: string) {
+/** The customer's private order page (same as orderLink in orders.ts — kept here to avoid a circular import). */
+const orderPageUrl = (o: Order, siteUrl: string) =>
+  o.access_token ? `${siteUrl}/order/${encodeURIComponent(o.order_number)}?t=${o.access_token}` : '';
+
+function customerEmail(o: Order, whatsappDisplay: string, siteUrl: string) {
   const t = o.language === 'kn' ? COPY.kn : COPY.en;
   const paid = o.payment_status === 'paid';
   const html = shell(`
@@ -178,6 +187,9 @@ function customerEmail(o: Order, whatsappDisplay: string) {
         <td valign="top"><div style="color:#6b6250;font-size:12px;">${t.preferred}</div>${esc(formatEta(o))}</td>
       </tr>
     </table>
+    ${orderPageUrl(o, siteUrl) ? `
+    <p style="margin:22px 0 0;line-height:1.6;color:#4a4332;font-size:14px;">${esc(t.manage)}</p>
+    <p style="margin:14px 0 0;"><a href="${esc(orderPageUrl(o, siteUrl))}" style="background:#c9a24b;color:#0b2e28;text-decoration:none;padding:11px 20px;border-radius:6px;font-weight:bold;display:inline-block;">${esc(t.viewOrder)}</a></p>` : ''}
     <p style="margin:24px 0 0;font-size:13px;color:#6b6250;">${esc(t.questions)} ${esc(whatsappDisplay)}</p>
   `);
   return { subject: t.subject(o.order_number), html };
@@ -294,7 +306,7 @@ export async function notifyOrder(db: SupabaseClient, orderId: string) {
 
   const jobs: [Attempt['channel'], Attempt['to'], () => Promise<string>][] = [
     ['email', 'customer', () => {
-      const m = customerEmail(o, whatsappDisplay);
+      const m = customerEmail(o, whatsappDisplay, siteUrl);
       return sendEmail(o.email, m.subject, m.html, adminEmailTo);
     }],
     ['email', 'admin', () => {

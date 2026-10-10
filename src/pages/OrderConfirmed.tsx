@@ -123,6 +123,14 @@ export default function OrderConfirmed() {
             {t('okWhatsApp')}
           </a>
         </p>
+        {order?.access_token && (
+          <Link
+            to={`/order/${encodeURIComponent(order.order_number)}?t=${order.access_token}`}
+            className="block w-fit mx-auto border border-gold text-gold text-sm font-semibold px-5 py-2.5 rounded-md hover:bg-gold/10 transition-colors"
+          >
+            {t('okManage')}
+          </Link>
+        )}
         <Link to="/shop" className="inline-block text-gold text-sm underline underline-offset-4">
           {t('continueBrowsing')}
         </Link>

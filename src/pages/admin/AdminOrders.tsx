@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { formatINR } from '../../lib/productUtils';
 import { inputClass } from './AdminProductForm';
 import { formatDeliveryRange, isSameDayOrder } from '../../lib/delivery';
+import { adminAction } from '../../lib/adminApi';
 
 interface OrderItem {
   type: 'product' | 'combo';
@@ -49,7 +50,16 @@ interface Order {
   notifications?: { channel: 'email' | 'whatsapp'; to: 'customer' | 'admin'; ok: boolean; detail: string }[];
   created_at: string;
   delivered_at?: string | null;
+  shipped_at?: string | null;
 }
+
+interface ReturnSummary {
+  order_id: string;
+  status: string;
+  amount: number;
+}
+
+const OPEN_RETURN = ['requested', 'approved', 'received'];
 
 const STATUS_LABEL: Record<Order['status'], string> = {
   awaiting_payment: 'Awaiting payment',
@@ -101,11 +111,17 @@ export default function AdminOrders() {
   const [tab, setTab] = useState<Tab>('active');
   const [openId, setOpenId] = useState<string | null>(null);
 
+  const [returns, setReturns] = useState<ReturnSummary[]>([]);
+
   async function load() {
-    const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    const [{ data, error }, { data: rets }] = await Promise.all([
+      supabase.from('orders').select('*').order('created_at', { ascending: false }),
+      supabase.from('return_requests').select('order_id, status, amount'),
+    ]);
     if (error) setErrorMsg('Could not load orders. Make sure you have run the latest supabase/schema.sql.');
     else {
       setOrders((data || []) as Order[]);
+      setReturns((rets || []) as ReturnSummary[]);
       setErrorMsg(null);
     }
     setLoading(false);
@@ -128,30 +144,74 @@ export default function AdminOrders() {
   }
 
   /** Status change; keeps the delivery date in step (used for "this month" sales). */
+  const [working, setWorking] = useState<string | null>(null);
+
+  /** Dispatched / delivered: saved by the server, which also emails the customer. */
+  async function serverStatus(o: Order, status: 'shipped' | 'delivered') {
+    setWorking(o.id);
+    try {
+      const { order } = await adminAction<{ order: Order }>({ action: 'order-status', orderId: o.id, status });
+      setOrders((list) => list.map((x) => (x.id === o.id ? order : x)));
+      setErrorMsg(null);
+    } catch (e) {
+      setErrorMsg(`Could not update ${o.order_number}: ${(e as Error).message}`);
+    } finally {
+      setWorking(null);
+    }
+  }
+
+  async function cancelOrder(o: Order) {
+    if (!confirm(`Cancel order ${o.order_number} (${o.customer_name})? The customer will get an email.`)) return;
+    const paidOnline = o.payment_method === 'online' && o.payment_status === 'paid';
+    const refund =
+      paidOnline &&
+      confirm(`Refund ${formatINR(o.total)} to the customer's original payment now, through Razorpay?\n\nOK = refund now · Cancel = I'll refund it myself later`);
+    setWorking(o.id);
+    try {
+      const { order } = await adminAction<{ order: Order }>({ action: 'order-cancel', orderId: o.id, refund });
+      setOrders((list) => list.map((x) => (x.id === o.id ? order : x)));
+      setErrorMsg(null);
+    } catch (e) {
+      setErrorMsg(`Could not cancel ${o.order_number}: ${(e as Error).message}`);
+    } finally {
+      setWorking(null);
+    }
+  }
+
+  /** Status change; keeps the delivery date in step (used for "this month" sales). */
   function setStatus(o: Order, status: Order['status']) {
+    if (status === 'shipped' || status === 'delivered') return serverStatus(o, status);
+    if (status === 'cancelled') return cancelOrder(o);
     const changes: Partial<Order> = { status };
-    if (status === 'delivered' && o.status !== 'delivered') changes.delivered_at = new Date().toISOString();
-    if (status !== 'delivered') changes.delivered_at = null;
+    if (o.status === 'delivered') changes.delivered_at = null;
     return patch(o, changes);
+  }
+
+  function markShipped(o: Order) {
+    const tracking = [o.courier, o.tracking_number].filter(Boolean).join(' · ');
+    const ok = confirm(
+      `Mark ${o.order_number} (${o.customer_name}) as dispatched? The customer gets an email` +
+        (tracking ? ` with tracking: ${tracking}.` : `.\n\nTip: add the courier and tracking number in the order details first, so they're in the email.`) +
+        '\n\nAfter this the customer can no longer cancel online.'
+    );
+    if (ok) serverStatus(o, 'shipped');
   }
 
   function markDelivered(o: Order) {
     const cod = o.payment_method === 'cod' && o.payment_status === 'cod_pending';
     const ok = confirm(
       `Mark ${o.order_number} (${o.customer_name}) as delivered?` +
-        (cod ? `
-
-This was pay on delivery — it will also record ${formatINR(o.total)} as received.` : '')
+        (cod ? `\n\nThis was pay on delivery — it will also record ${formatINR(o.total)} as received.` : '') +
+        '\n\nThe customer gets an email; their 3 days to report a damaged or defective item start now.'
     );
-    if (!ok) return;
-    patch(o, {
-      status: 'delivered',
-      delivered_at: new Date().toISOString(),
-      ...(cod ? { payment_status: 'paid' as const } : {}),
-    });
+    if (ok) serverStatus(o, 'delivered');
   }
 
   const sales = orders.filter(isSale);
+  const saleIds = new Set(sales.map((o) => o.id));
+  const refunded = returns.filter((r) => r.status === 'refunded' && saleIds.has(r.order_id));
+  const refundedTotal = refunded.reduce((t, r) => t + Number(r.amount), 0);
+  const openReturns = new Set(returns.filter((r) => OPEN_RETURN.includes(r.status)).map((r) => r.order_id));
   const now = new Date();
   const salesThisMonth = sales.filter((o) => {
     const d = deliveredOn(o);
@@ -172,7 +232,12 @@ This was pay on delivery — it will also record ${formatINR(o.total)} as receiv
       {!loading && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
           {[
-            { label: 'Total sales', value: sum(sales), note: `${sales.length} delivered order${sales.length === 1 ? '' : 's'}`, accent: true },
+            {
+              label: 'Total sales',
+              value: sum(sales) - refundedTotal,
+              note: `${sales.length} delivered order${sales.length === 1 ? '' : 's'}${refundedTotal ? ` · after ${formatINR(refundedTotal)} refunded` : ''}`,
+              accent: true,
+            },
             {
               label: `${now.toLocaleString('en-IN', { month: 'long' })} sales`,
               value: sum(salesThisMonth),
@@ -248,16 +313,29 @@ This was pay on delivery — it will also record ${formatINR(o.total)} as receiv
                   {TO_DELIVER.includes(o.status) && isSameDayOrder(o.created_at, o.preferred_delivery_date) && (
                     <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-kumkum text-cream">⚡ Same-day</span>
                   )}
+                  {openReturns.has(o.id) && (
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-neela text-cream">↩ Return request</span>
+                  )}
                   <span className={`text-xs px-2.5 py-1 rounded-full ${pay.cls}`}>{pay.text}</span>
                   <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-950/70 text-cream/80">{STATUS_LABEL[o.status]}</span>
                   <span className="text-gold font-semibold">{formatINR(o.total)}</span>
                   <span className="text-cream/40">{open ? '▴' : '▾'}</span>
                 </button>
                 {TO_DELIVER.includes(o.status) ? (
-                  <div className="w-full sm:w-auto px-4 pb-4 sm:pb-0 sm:pl-0">
+                  <div className="w-full sm:w-auto px-4 pb-4 sm:pb-0 sm:pl-0 flex gap-2">
+                    {o.status !== 'shipped' && (
+                      <button
+                        onClick={() => markShipped(o)}
+                        disabled={working === o.id}
+                        className="flex-1 sm:flex-none text-sm font-semibold px-4 py-2 rounded-md border border-neela-light/70 text-neela-light hover:bg-neela/20 transition-colors disabled:opacity-50"
+                      >
+                        🚚 Mark shipped
+                      </button>
+                    )}
                     <button
                       onClick={() => markDelivered(o)}
-                      className="w-full sm:w-auto text-sm font-semibold px-4 py-2 rounded-md bg-gold text-emerald-950 hover:bg-gold-light transition-colors"
+                      disabled={working === o.id}
+                      className="flex-1 sm:flex-none text-sm font-semibold px-4 py-2 rounded-md bg-gold text-emerald-950 hover:bg-gold-light transition-colors disabled:opacity-50"
                     >
                       ✓ Mark delivered
                     </button>

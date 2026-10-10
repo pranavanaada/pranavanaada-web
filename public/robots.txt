@@ -3,5 +3,6 @@ Allow: /
 Disallow: /admin
 Disallow: /checkout
 Disallow: /order-confirmed
+Disallow: /order/
 
 Sitemap: https://www.pranavanaada.com/sitemap.xml

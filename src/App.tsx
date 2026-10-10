@@ -20,6 +20,7 @@ import {
   Checkout,
   OrderConfirmed,
   Policy,
+  OrderPage,
   AdminRoot,
   ProtectedRoute,
   AdminLogin,
@@ -31,6 +32,7 @@ import {
   AdminComboForm,
   AdminSettings,
   AdminOrders,
+  AdminReturns,
   AdminResetPassword,
 } from './pages/lazy';
 
@@ -79,6 +81,7 @@ export default function App() {
           <Route path="/order-confirmed" element={<PublicLayout><OrderConfirmed /></PublicLayout>} />
           <Route path="/policies" element={<Navigate to="/policies/returns" replace />} />
           <Route path="/policies/:slug" element={<PublicLayout><Policy /></PublicLayout>} />
+          <Route path="/order/:number" element={<PublicLayout><OrderPage /></PublicLayout>} />
 
           {/* Admin — login required. Loaded on demand, with its own auth provider. */}
           <Route
@@ -107,6 +110,7 @@ export default function App() {
               <Route path="combos/:id/edit" element={<AdminComboForm />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="returns" element={<AdminReturns />} />
             </Route>
           </Route>
         </Routes>

@@ -52,4 +52,4 @@ export function safeEqual(a: string, b: string) {
 
 /** Fields the customer's confirmation page is allowed to see. */
 export const PUBLIC_ORDER_FIELDS =
-  'order_number, customer_name, email, phone, address_line1, address_line2, landmark, city, state, pincode, delivery_from, preferred_delivery_date, items, subtotal, shipping_fee, total, payment_method, payment_status, status, created_at';
+  'order_number, customer_name, email, phone, address_line1, address_line2, landmark, city, state, pincode, delivery_from, preferred_delivery_date, items, subtotal, shipping_fee, total, payment_method, payment_status, status, created_at, access_token';
