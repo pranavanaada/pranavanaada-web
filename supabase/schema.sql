@@ -172,7 +172,7 @@ create policy "Admins can update store settings" on store_settings
 -- 5c. Orders — created ONLY by the `create-order` Edge Function, which
 --     recalculates every price from the database (never trusts the browser).
 -- ─────────────────────────────────────────────────────────────────────────────
-create sequence if not exists order_number_seq start 1001;
+create sequence if not exists order_number_seq start 1;
 
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
@@ -229,6 +229,20 @@ alter table orders add column if not exists notified_at timestamptz;
 alter table orders add column if not exists notifications jsonb not null default '[]';
 alter table orders add column if not exists delivered_at timestamptz;   -- set when the admin marks it delivered (sales totals)
 alter table orders add column if not exists delivery_from date;        -- expected delivery window: delivery_from … preferred_delivery_date (set from the address)
+
+-- Order numbers PN-00001, PN-00002 … (restarted on 10 Oct 2026 after test orders were deleted).
+-- Skips any number that's already used, e.g. orders kept from before the restart (PN-01007, PN-01008).
+create or replace function public.next_order_number() returns text
+language plpgsql as $$
+declare n text;
+begin
+  loop
+    n := 'PN-' || lpad(nextval('public.order_number_seq')::text, 5, '0');
+    exit when not exists (select 1 from public.orders where order_number = n);
+  end loop;
+  return n;
+end $$;
+alter table orders alter column order_number set default public.next_order_number();
 
 alter table orders enable row level security;
 drop policy if exists "Admins can view orders" on orders;
