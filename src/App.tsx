@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -19,6 +19,7 @@ import {
   Contact,
   Checkout,
   OrderConfirmed,
+  Policy,
   AdminRoot,
   ProtectedRoute,
   AdminLogin,
@@ -76,6 +77,8 @@ export default function App() {
           <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
           <Route path="/checkout" element={<PublicLayout><Checkout /></PublicLayout>} />
           <Route path="/order-confirmed" element={<PublicLayout><OrderConfirmed /></PublicLayout>} />
+          <Route path="/policies" element={<Navigate to="/policies/returns" replace />} />
+          <Route path="/policies/:slug" element={<PublicLayout><Policy /></PublicLayout>} />
 
           {/* Admin — login required. Loaded on demand, with its own auth provider. */}
           <Route

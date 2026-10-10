@@ -16,6 +16,7 @@ import { useCart } from '../hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
 import { productName, productPath } from '../lib/productUtils';
 import { fadeUp, stagger } from './motion';
+import { POLICIES } from '../content/policies';
 
 const icon = {
   viewBox: '0 0 24 24',
@@ -240,6 +241,13 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {t('brand')}. {t('rights')}
           </p>
+          <nav aria-label={t('policies')} className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            {POLICIES[lang].map((p) => (
+              <Link key={p.slug} to={`/policies/${p.slug}`} className="hover:text-gold transition-colors">
+                {p.short}
+              </Link>
+            ))}
+          </nav>
           <p>{t('footerTagline')}</p>
         </div>
       </div>

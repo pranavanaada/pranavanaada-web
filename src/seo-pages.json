@@ -22,5 +22,25 @@
   "/contact": {
     "title": "Contact Pranavanaada — Order Panchaloha Pooja Bells",
     "description": "Call or WhatsApp +91 8050124365 or email pranavanaadaa@gmail.com to order Panchaloha pooja bells or ask a question."
+  },
+  "/policies/returns": {
+    "title": "Returns, Replacements & Refunds | Pranavanaada",
+    "description": "Damaged or defective? Report it within 3 days of delivery with an unboxing video and choose a replacement or a refund to your original payment method."
+  },
+  "/policies/shipping": {
+    "title": "Shipping & Delivery | Pranavanaada",
+    "description": "Same-day delivery in Bengaluru for orders before 12 pm, 1–2 days across Karnataka and 3–4 days to other states. Pay online or on delivery."
+  },
+  "/policies/cancellation": {
+    "title": "Cancellation Policy | Pranavanaada",
+    "description": "Cancel your Pranavanaada order any time before it is dispatched, with a full refund to your original payment method. No cancellation fee."
+  },
+  "/policies/terms": {
+    "title": "Terms & Conditions | Pranavanaada",
+    "description": "Terms for buying handmade Panchaloha pooja bells from Pranavanaada, Bengaluru — products, prices, payments, orders and governing law."
+  },
+  "/policies/privacy": {
+    "title": "Privacy Policy | Pranavanaada",
+    "description": "What personal information Pranavanaada collects when you order or enquire, how it is used, who it is shared with, and your choices."
   }
 }

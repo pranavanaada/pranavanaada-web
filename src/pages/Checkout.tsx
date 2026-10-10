@@ -533,6 +533,18 @@ export default function Checkout() {
                 : t('coPlaceCod')}
           </motion.button>
 
+          <p className="text-[11px] text-cream/45 text-center mt-3 leading-relaxed">
+            {t('coAgree')}{' '}
+            <Link to="/policies/terms" target="_blank" className="underline underline-offset-2 hover:text-gold">
+              {t('coAgreeTerms')}
+            </Link>{' '}
+            {t('coAgreeAnd')}{' '}
+            <Link to="/policies/returns" target="_blank" className="underline underline-offset-2 hover:text-gold">
+              {t('coAgreeReturns')}
+            </Link>
+            {t('coAgreeEnd')}
+          </p>
+
           <a
             href={whatsappFallback}
             target="_blank"
