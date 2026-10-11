@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "upload-media": "node scripts/upload-media.mjs",
-    "make-spin": "node scripts/make-spin.mjs"
+    "make-spin": "node scripts/make-spin.mjs",
+    "set-razorpay-keys": "node scripts/set-razorpay-keys.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

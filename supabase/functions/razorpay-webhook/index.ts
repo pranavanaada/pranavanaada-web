@@ -23,11 +23,9 @@ Deno.serve(async (req) => {
   const now = new Date().toISOString();
 
   if (event.event === 'payment.captured' || event.event === 'order.paid') {
-    await db
-      .from('orders')
-      .update({ payment_status: 'paid', razorpay_payment_id: payment.id, paid_at: now, status: 'placed', updated_at: now })
-      .eq('razorpay_order_id', rzpOrderId)
-      .neq('payment_status', 'paid');
+    // Marks it paid and gives the order its PN number (no-op if already paid)
+    const { error: paidError } = await db.rpc('mark_order_paid', { p_rzp_order_id: rzpOrderId, p_payment_id: payment.id });
+    if (paidError) throw paidError;
     // Covers customers who paid but closed the page before verify-payment ran.
     const { data: paidOrder } = await db
       .from('orders')

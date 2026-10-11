@@ -19,14 +19,10 @@ Deno.serve(async (req) => {
     if (!safeEqual(expected, String(razorpay_signature))) return json({ error: 'invalid_signature' }, 400);
 
     const db = adminClient();
-    const now = new Date().toISOString();
-    // Skip the update if the webhook already recorded this payment (so an admin's
-    // later status change isn't overwritten).
-    await db
-      .from('orders')
-      .update({ payment_status: 'paid', razorpay_payment_id, paid_at: now, status: 'placed', updated_at: now })
-      .eq('razorpay_order_id', razorpay_order_id)
-      .neq('payment_status', 'paid');
+    // Marks it paid and gives the order its PN number. Does nothing if the webhook already
+    // recorded this payment (so an admin's later status change isn't overwritten).
+    const { error: paidError } = await db.rpc('mark_order_paid', { p_rzp_order_id: razorpay_order_id, p_payment_id: razorpay_payment_id });
+    if (paidError) throw paidError;
 
     const { data: order, error } = await db
       .from('orders')

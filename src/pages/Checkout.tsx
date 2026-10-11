@@ -159,6 +159,10 @@ export default function Checkout() {
       case 'cod_not_allowed':
         setMethod('online');
         return setMessage(t('coErrCod'));
+      case 'payment_unavailable':
+        // Razorpay isn't accepting payments right now — offer pay on delivery instead
+        if (codAllowed) setMethod('cod');
+        return setMessage(t(codAllowed ? 'coErrPayUnavailableCod' : 'coErrPayUnavailable'));
       case 'not_setup':
         return setMessage(t('coErrNotSetup'));
       case 'payment_cancelled':

@@ -2,7 +2,7 @@
 // database (the browser's prices are never trusted), checks stock, saves the
 // order, and for "Pay Now" creates the matching Razorpay order.
 import { adminClient, corsHeaders, env, json, PUBLIC_ORDER_FIELDS } from '../_shared/common.ts';
-import { notifyInBackground } from '../_shared/notify.ts';
+import { esc, notifyInBackground, optEnv, sendEmail, shell } from '../_shared/notify.ts';
 import { deliveryEstimate, GRACE_MS } from '../_shared/delivery.ts';
 
 type CartLine =
@@ -167,31 +167,26 @@ Deno.serve(async (req) => {
       return json({ error: 'online_not_allowed' }, 400);
     }
 
-    // ---- Save the order -------------------------------------------------------
-    const { data: order, error: insertError } = await db
-      .from('orders')
-      .insert({
-        ...customer,
-        items,
-        subtotal,
-        shipping_fee: shipping,
-        total,
-        payment_method: paymentMethod,
-        payment_status: paymentMethod === 'cod' ? 'cod_pending' : 'pending',
-        status: paymentMethod === 'cod' ? 'placed' : 'awaiting_payment',
-      })
-      .select('id, order_number')
-      .single();
-    if (insertError || !order) throw insertError ?? new Error('Could not save order');
+    const orderRow = { ...customer, items, subtotal, shipping_fee: shipping, total, payment_method: paymentMethod };
 
+    // ---- Pay on delivery: the order is final now ------------------------------
     if (paymentMethod === 'cod') {
-      // Pay-on-delivery orders are final now: send confirmations (email + WhatsApp).
-      await notifyInBackground(db, order.id);
+      const { data: order, error: insertError } = await db
+        .from('orders')
+        .insert({ ...orderRow, payment_status: 'cod_pending', status: 'placed' })
+        .select('id')
+        .single();
+      if (insertError || !order) throw insertError ?? new Error('Could not save order');
+      await notifyInBackground(db, order.id); // confirmations (email + WhatsApp)
       const { data: summary } = await db.from('orders').select(PUBLIC_ORDER_FIELDS).eq('id', order.id).single();
       return json({ order: summary });
     }
 
-    // ---- Create the Razorpay order (amount in paise) --------------------------
+    // ---- Pay online: ask Razorpay first (amount in paise) ----------------------
+    // Nothing is saved unless Razorpay accepts, and the order only gets its PN number once
+    // the payment succeeds (mark_order_paid) — until then it carries a temporary reference,
+    // so failed or abandoned payments don't use up order numbers.
+    const paymentRef = `PAY-${crypto.randomUUID().replace(/-/g, '').slice(0, 6).toUpperCase()}`;
     const keyId = env('RAZORPAY_KEY_ID');
     const keySecret = env('RAZORPAY_KEY_SECRET');
     const rzp = await fetch('https://api.razorpay.com/v1/orders', {
@@ -203,16 +198,26 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         amount: Math.round(total * 100),
         currency: 'INR',
-        receipt: order.order_number,
-        notes: { order_id: order.id, order_number: order.order_number },
+        receipt: paymentRef,
+        notes: { payment_ref: paymentRef, customer: customer.customer_name, phone: customer.phone },
       }),
     });
-    const rzpOrder = await rzp.json();
-    if (!rzp.ok) {
-      await db.from('orders').update({ payment_status: 'failed', admin_notes: 'Razorpay order creation failed' }).eq('id', order.id);
-      throw new Error(rzpOrder?.error?.description ?? 'Razorpay order creation failed');
+    const rzpOrder = await rzp.json().catch(() => ({}));
+    if (!rzp.ok || !rzpOrder?.id) {
+      const reason = rzpOrder?.error?.description ?? `HTTP ${rzp.status}`;
+      console.error('Razorpay order creation failed:', reason);
+      await alertPaymentsDown(reason, customer.customer_name, customer.phone);
+      return json({ error: 'payment_unavailable' }, 503);
     }
-    await db.from('orders').update({ razorpay_order_id: rzpOrder.id }).eq('id', order.id);
+
+    const { error: insertError } = await db.from('orders').insert({
+      ...orderRow,
+      order_number: paymentRef,
+      razorpay_order_id: rzpOrder.id,
+      payment_status: 'pending',
+      status: 'awaiting_payment',
+    });
+    if (insertError) throw insertError;
 
     return json({
       razorpay: {
@@ -221,10 +226,32 @@ Deno.serve(async (req) => {
         amount: rzpOrder.amount,
         currency: 'INR',
       },
-      order_number: order.order_number,
+      order_number: paymentRef,
     });
   } catch (e) {
     console.error(e);
     return json({ error: 'server_error', message: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
+
+// Tell the owner straight away when Razorpay refuses to start payments (e.g. the API keys
+// were regenerated in Razorpay but not updated here). At most one email every 20 minutes.
+let lastPaymentsAlert = 0;
+async function alertPaymentsDown(reason: string, customerName: string, phone: string) {
+  if (Date.now() - lastPaymentsAlert < 20 * 60 * 1000) return;
+  lastPaymentsAlert = Date.now();
+  try {
+    await sendEmail(
+      optEnv('ADMIN_EMAIL') || 'pranavanaadaa@gmail.com',
+      '⚠️ Online payments are failing on pranavanaada.com',
+      shell(`
+        <p style="font-size:17px;font-weight:bold;margin:0 0 10px;color:#a33;">Customers cannot pay online right now</p>
+        <p style="margin:0 0 12px;line-height:1.6;">Razorpay refused to start a payment. Razorpay's message: <b>${esc(reason)}</b></p>
+        <p style="margin:0 0 12px;line-height:1.6;">Customer who just tried: <b>${esc(customerName)}</b> (${esc(phone)}) — they were asked to use Pay on delivery instead.</p>
+        <p style="margin:0 0 12px;line-height:1.6;"><b>"Authentication failed"</b> means the Razorpay API keys saved on the website are no longer valid — usually because new keys were generated in the Razorpay dashboard. Save the new keys on the website (run <code>npm run set-razorpay-keys</code> in the project), or switch off "Online payment" in Admin → Settings until it is fixed.</p>
+      `)
+    );
+  } catch (e) {
+    console.error('payments-down alert failed', e);
+  }
+}
