@@ -69,12 +69,11 @@ export default function Checkout() {
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
-  const [customer, setCustomer] = useState<CheckoutCustomer>(() => ({ ...EMPTY, ...loadSavedDetails() }));
+  const [customer, setCustomer] = useState<CheckoutCustomer>(() => ({ ...EMPTY, ...loadSavedDetails(), gstin: '' }));
   const [method, setMethod] = useState<PaymentMethod>('online');
   const [errors, setErrors] = useState<Field[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [showGst, setShowGst] = useState(!!customer.gstin);
   // A saved online order waiting for payment (after cancel/failure) — retry reuses it.
   const [pending, setPending] = useState<{ key: string; orderId: string; amount: number; orderNumber: string } | null>(null);
   // A started-but-unpaid online order is for the list as it was; if the list changes, the next
@@ -367,22 +366,6 @@ export default function Checkout() {
                 <label className={label}>{t('coNotes')}</label>
                 <textarea rows={2} value={customer.notes} onChange={set('notes')} className={`${inputBase} border-emerald-700 resize-y`} />
               </div>
-              {showGst ? (
-                <div className="max-w-xs" data-first-error={firstError === 'gstin' || undefined}>
-                  <label className={label}>{t('coGstin')}</label>
-                  <input
-                    maxLength={15}
-                    value={customer.gstin}
-                    onChange={(e) => setCustomer((c) => ({ ...c, gstin: e.target.value.toUpperCase() }))}
-                    className={fieldClass('gstin')}
-                  />
-                  <FieldError f="gstin" />
-                </div>
-              ) : (
-                <button type="button" onClick={() => setShowGst(true)} className="text-xs text-gold hover:underline">
-                  + {t('coGst')}
-                </button>
-              )}
             </div>
           </section>
 
