@@ -10,6 +10,8 @@ import { WhyChoose, JourneyCta } from '../components/HomeSections';
 import RingTheBell from '../components/RingTheBell';
 import HeroBells from '../components/HeroBells';
 import CombosSection from '../components/CombosSection';
+import HomeEnquirySection from '../components/HomeEnquirySection';
+import EnquiryPopup from '../components/EnquiryPopup';
 // Below the fold, and carries all review text + avatars — loaded as its own
 // chunk so it doesn't slow the first paint of the home page.
 const ReviewsSection = lazy(() => import('../components/ReviewsSection'));
@@ -303,11 +305,19 @@ export default function Home() {
         <JourneyCta />
       </div>
 
+      {/* Enquiry form section */}
+      <div className="snap-section">
+        <HomeEnquirySection />
+      </div>
+
       <InquiryModal
         open={modalOpen}
         productName={enquiryName}
         onClose={() => setModalOpen(false)}
       />
+
+      {/* 3-second popup — only on the home page, once per session */}
+      <EnquiryPopup />
     </>
   );
 }

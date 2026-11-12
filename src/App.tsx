@@ -19,6 +19,7 @@ import {
   Contact,
   Checkout,
   OrderConfirmed,
+  ThankYouEnquiry,
   Policy,
   OrderPage,
   AdminRoot,
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
           <Route path="/checkout" element={<PublicLayout><Checkout /></PublicLayout>} />
           <Route path="/order-confirmed" element={<PublicLayout><OrderConfirmed /></PublicLayout>} />
+          <Route path="/thank-you-enquiry" element={<PublicLayout><ThankYouEnquiry /></PublicLayout>} />
           <Route path="/policies" element={<Navigate to="/policies/returns" replace />} />
           <Route path="/policies/:slug" element={<PublicLayout><Policy /></PublicLayout>} />
           <Route path="/order/:number" element={<PublicLayout><OrderPage /></PublicLayout>} />
